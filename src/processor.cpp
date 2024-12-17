@@ -7,6 +7,7 @@ void Processor::Run() {
         std::getline(std::cin, cmd);
         s_cmd = Split(cmd, ' ');
 
+        std::string RED = "\e[1;31m";
         std::string YELLOW = "\e[1;33m";
         std::string PURPLE = "\e[1;35m";
         std::string WHITE = "\e[97m";
@@ -19,13 +20,19 @@ void Processor::Run() {
         } 
         
         else if (s_cmd[0] == "create" && s_cmd.size() > 1) {
+            if (kernel_ != nullptr) {
+                std::cout << RED << "[ERROR]" << WHITE << " The player is already set.\n" << RESET;
+                continue;
+            }
             if (s_cmd[1] == "master") {
-                std::cout << YELLOW << "[PLUG]" << WHITE << " Set the master player.\n" << RESET;
+                kernel_ = new Kernel(1);
             } else if (s_cmd[1] == "slave") {
-                std::cout << YELLOW << "[PLUG]" << WHITE << " Set the slave player.\n" << RESET;
+                kernel_ = new Kernel(0);
             } else {
                 std::cout << PURPLE << "[WARNING]" << WHITE << " You are only able to set master or slave player's type.\n" << RESET;
+                continue;
             }
+            std::cout << "ok\n";
         } 
         
         else if (s_cmd[0] == "start") {
@@ -35,13 +42,22 @@ void Processor::Run() {
         }
         
         else if (s_cmd[0] == "set" && s_cmd.size() > 2) {
+            if (kernel_ == nullptr) {
+                std::cout << PURPLE << "[WARNING]" << WHITE << " You aren't able to set any game setting while the type of the player is unset.\n" << RESET;
+                continue;
+            }
+            if (!IsNumber(s_cmd[2]) || !(!(s_cmd.size() > 3) || IsNumber(s_cmd[3]))) {
+                std::cout << "failed\n";
+                continue;
+            }
+
             if (s_cmd[1] == "width") {
-                std::cout << YELLOW << "[PLUG]" << WHITE << " Set width = " << std::stoll(s_cmd[2]) << '\n' << RESET;
+                std::cout << (kernel_->SetWidth(std::stoll(s_cmd[2])) ? "ok\n" : "failed\n");
             } else if (s_cmd[1] == "height") {
-                std::cout << YELLOW << "[PLUG]" << WHITE << " Set height = " << std::stoll(s_cmd[2]) << '\n' << RESET;
+                std::cout << (kernel_->SetHeight(std::stoll(s_cmd[2])) ? "ok\n" : "failed\n");
             } else if (s_cmd[1] == "count" && s_cmd.size() > 3) {
-                std::cout << YELLOW << "[PLUG]" << WHITE << " Set count of " << std::stoi(s_cmd[2]) << " ship's type for " << std::stoll(s_cmd[3]) << " items." << '\n' << RESET;
-            } 
+                std::cout << (kernel_->SetCount(std::stoi(s_cmd[2]), std::stoll(s_cmd[3])) ? "ok\n" : "failed\n");
+            }
             
             else if (s_cmd[1] == "strategy") {
                 if (s_cmd[2] == "ordered") {
@@ -108,4 +124,10 @@ void Processor::Run() {
 
 void Processor::Test() {
     std::cout << "pong\n";
+}
+
+Processor::~Processor() {
+    if (kernel_ != nullptr) {
+        delete kernel_;  // we allocate this memory in proccesor run.
+    }
 }

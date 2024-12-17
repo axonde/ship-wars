@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "kernel.h"
 
 class Processor {
 public:
@@ -20,4 +21,11 @@ public:
         }
         return arr;
     }
+    static bool IsNumber(const std::string &s) {
+        return !s.empty() && std::all_of(s.begin(), s.end(), ::isdigit);
+    }
+
+    ~Processor();
+private:
+    Kernel* kernel_ = nullptr;
 };

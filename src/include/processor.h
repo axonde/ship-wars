@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "kernel.h"
+#include "utils.h"
 
 class Processor {
 public:

@@ -1,7 +1,10 @@
 #pragma once
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <iostream>
+#include "map.h"
+#include "strategy.h"
 
 class Kernel {
 public:
@@ -10,18 +13,26 @@ public:
     bool SetWidth(uint64_t width);
     bool SetHeight(uint64_t height);
     bool SetCount(uint8_t type, uint64_t count);
+    bool SetStrategy(uint8_t strategy);
+
+    uint64_t GetWidth();
+    uint64_t GetHeight();
+    uint64_t GetCount(uint8_t type);
+
+    bool IsReady();
+    void Start();
 
 private:
     struct Dimension {
         uint64_t width_;
         uint64_t height_;
-    };
-    struct Strategy {
-        // временная заглушка для стратегии
+        bool Empty();
     };
     bool type_;  // тип игрока: 0 - slave; 1 - master
     Dimension dimension_;  // размерность поля
     Strategy strategy_;  // выбранная стратегия
+    Map map_;  // наша карта
+    Map enemy_;  // карта врага
     std::array<uint64_t, 4> ships_;  // количество кораблей
     bool win_ = false;  // выиграна ли игра
 };

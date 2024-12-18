@@ -15,4 +15,6 @@ namespace Help {
     void ErrorStrategy();
     void ErrorResult();
     void ErrorUnknowCmd();
+    void ErrorStrategyParsing();
+    void ErrorWhileGetting();
 }

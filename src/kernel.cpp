@@ -2,6 +2,10 @@
 
 Kernel::Kernel(bool type) : type_(type) {}
 
+bool Kernel::Dimension::Empty() {
+    return width_ == 0 || height_ == 0;
+}
+
 
 bool Kernel::SetWidth(uint64_t width) {
     dimension_.width_ = width;
@@ -17,4 +21,31 @@ bool Kernel::SetCount(uint8_t type, uint64_t count) {
     }
     ships_[type] = count;
     return true;
+}
+bool Kernel::SetStrategy(uint8_t type) {
+    return strategy_.SetType(type);
+}
+
+uint64_t Kernel::GetWidth() {
+    return dimension_.width_;
+}
+uint64_t Kernel::GetHeight() {
+    return dimension_.height_;
+}
+uint64_t Kernel::GetCount(uint8_t type) {
+    if (type > 3) {
+        return 0;
+    }
+    return ships_[type];
+}
+
+bool Kernel::IsReady() {
+    if (dimension_.Empty() || std::all_of(ships_.begin(), ships_.end(), [](const auto& x) {return x == 0;})) {
+        return false;
+    }
+    return true;
+}
+
+void Kernel::Start() {
+    
 }

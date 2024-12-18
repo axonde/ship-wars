@@ -21,3 +21,9 @@ void Help::ErrorResult() {
 void Help::ErrorUnknowCmd() {
     std::cout << PURPLE << "[WARNING]" << WHITE << " Unknow command.\n" << RESET;
 }
+void Help::ErrorStrategyParsing() {
+    std::cout << RED << "[ERROR]" << WHITE << " Try to set inexistable ship's type.\n" << RESET;
+}
+void Help::ErrorWhileGetting() {
+    std::cout << RED << "[ERROR]" << WHITE << " Can't get the given parameters.\n" << RESET;
+}

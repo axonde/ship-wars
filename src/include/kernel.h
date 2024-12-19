@@ -20,19 +20,17 @@ public:
     uint64_t GetCount(uint8_t type);
 
     bool IsReady();
+    bool IsStarted();
     void Start();
 
+    ~Kernel();
 private:
-    struct Dimension {
-        uint64_t width_;
-        uint64_t height_;
-        bool Empty();
-    };
+    bool started_ = false;
     bool type_;  // тип игрока: 0 - slave; 1 - master
     Dimension dimension_;  // размерность поля
     Strategy strategy_;  // выбранная стратегия
-    Map map_;  // наша карта
-    Map enemy_;  // карта врага
+    Map* map_ = nullptr;  // наша карта
+    Map* enemy_ = nullptr;  // карта врага
     std::array<uint64_t, 4> ships_;  // количество кораблей
     bool win_ = false;  // выиграна ли игра
 };

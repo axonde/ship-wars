@@ -1,11 +1,8 @@
 #include "include/kernel.h"
 
-Kernel::Kernel(bool type) : type_(type) {}
-
-bool Kernel::Dimension::Empty() {
-    return width_ == 0 || height_ == 0;
+Kernel::Kernel(bool type) : type_(type) {
+    ships_.fill(0);
 }
-
 
 bool Kernel::SetWidth(uint64_t width) {
     dimension_.width_ = width;
@@ -45,7 +42,21 @@ bool Kernel::IsReady() {
     }
     return true;
 }
+bool Kernel::IsStarted() {
+    return started_;
+}
 
 void Kernel::Start() {
-    
+    map_ = new Map(ships_, &dimension_);
+    enemy_ = new Map();
+    started_ = true;
+}
+
+Kernel::~Kernel() {
+    if (map_ != nullptr) {
+        delete map_;
+    }
+    if (enemy_ != nullptr) {
+        delete enemy_;
+    }
 }

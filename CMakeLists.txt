@@ -19,6 +19,8 @@ else()
     message(FATAL_ERROR "Boost not found!")
 endif()
 
+add_compile_options(-fsanitize=address)
+add_link_options(-fsanitize=address)
 
 add_subdirectory(src)
 

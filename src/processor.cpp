@@ -21,9 +21,7 @@ void Processor::Run() {
 
         // CREATE
         else if (s_cmd[0] == "create" && s_cmd.size() > 1) {
-            if (!Create(s_cmd)) {
-                continue;
-            }
+            if (!Create(s_cmd)) continue;
         }
 
         else if (kernel_ == nullptr) {
@@ -33,17 +31,14 @@ void Processor::Run() {
         
         // START & STOP
         else if (s_cmd[0] == "start") {
-            if (!Start()) std::cout << "failed\n";
-            else std::cout << "ok\n";
+            std::cout << (!Start() ? "failed\n" : "ok\n");
         } else if (s_cmd[0] == "stop") {
             std::cout << YELLOW << "[PLUG]" << WHITE << " Stop the game.\n" << RESET;
         }
         
         // SETTERS
         else if (s_cmd[0] == "set" && s_cmd.size() > 2) {
-            if (!Set(s_cmd)) {
-                continue;
-            }
+            if (!Set(s_cmd)) continue;
         }
         
         // GETTERS
@@ -102,6 +97,10 @@ bool Processor::Create(const std::vector<std::string>& s_cmd) {
 }
 
 bool Processor::Set(const std::vector<std::string>& s_cmd) {
+    if (kernel_->IsStarted()) {
+        return false;
+    }
+
     if (s_cmd[1] == "strategy") {
         if (s_cmd[2] == "ordered") {
             if (kernel_->SetStrategy(0)) std::cout << "ok\n";
@@ -159,11 +158,10 @@ void Processor::Get(const std::vector<std::string>& s_cmd) {
 }
 
 bool Processor::Start() {
-    if (!kernel_->IsReady()) {
+    if (!kernel_->IsReady() || kernel_->IsStarted()) {
         return false;
     }
-    std::cout << Help::YELLOW << "[PLUG]" << Help::WHITE << " Start the game.\n" << Help::RESET;
-    kernel->Start();
+    kernel_->Start();
     return true;
 }
 

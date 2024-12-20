@@ -31,6 +31,6 @@ private:
     Strategy strategy_;  // выбранная стратегия
     Map* map_ = nullptr;  // наша карта
     Map* enemy_ = nullptr;  // карта врага
-    std::array<uint64_t, 4> ships_;  // количество кораблей
+    std::array<uint64_t, 5> ships_;  // количество кораблей
     bool win_ = false;  // выиграна ли игра
 };

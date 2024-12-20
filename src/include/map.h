@@ -22,6 +22,10 @@ struct Coords {
     uint64_t x;
     uint64_t y;
     bool operator == (const Coords& coords) const;
+    bool IsTouchingTop() const ;
+    bool IsTouchingRight(const Dimension& dimension) const ;
+    bool IsTouchingBottom(const Dimension& dimension) const;
+    bool IsTouchingLeft() const;
 };
 
 class Map {
@@ -47,8 +51,9 @@ private:
     UnorderedMap map_;
     Dimension* dimension_ = nullptr;
 
-    void drawing_(UnorderedMap& drawing, const UnorderedSet& restricted_area, uint64_t x, uint64_t y);
-    uint8_t get_rate_(const UnorderedSet& restricted_area, uint64_t x, uint64_t y) const;
+    void draw_(UnorderedMap& drawing, const UnorderedSet& restricted_area, const Coords& coords);
+    void update_drawing_(UnorderedMap& drawing, UnorderedSet& restricted_area, const Coords& coords, uint8_t type, bool rotate);
+    uint8_t get_rate_(const UnorderedSet& restricted_area, const Coords& coords) const;
     void choose_pixels_(const UnorderedMap& drawing, std::vector<std::pair<Coords, ShipSetting>>& maxs, uint8_t type);
     void update_restricted_area_(UnorderedMap& drawing, UnorderedSet& restricted_area, const Coords& coords, uint8_t type, bool rotate);
     void set_ship_(UnorderedMap& drawing, UnorderedSet& restricted_area, uint8_t type);

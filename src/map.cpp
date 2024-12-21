@@ -39,21 +39,21 @@ Map::Map(std::array<uint64_t, 5> ships, Dimension* dimension) {
 
     draw_(drawing, restricted_area, {0, 0});
 
-    // std::cout << "Look the drawing\n";
-    // for (const auto& [c, r] : drawing) {
-    //     std::cout << "(" << c.x << ' ' << c.y << " -> " << (int)r << ") ";
-    // }
-    // std::cout << '\n';
+    std::cout << "Look the drawing\n";
+    for (const auto& [c, r] : drawing) {
+        std::cout << "(" << c.x << ' ' << c.y << " -> " << (int)r << ") ";
+    }
+    std::cout << '\n';
 
     for (uint8_t type = 4; type != 0; --type) {
         for (uint64_t i = 0; i != ships[type]; ++i) {
             set_ship_(drawing, restricted_area, type);
 
-            // std::cout << "Look the drawing (after the ship setting) \n";
-            // for (const auto& [c, r] : drawing) {
-            //     std::cout << "(" << c.x << ' ' << c.y << " -> " << (int)r << ") ";
-            // }
-            // std::cout << '\n';
+            std::cout << "Look the drawing (after the ship setting) \n";
+            for (const auto& [c, r] : drawing) {
+                std::cout << "(" << c.x << ' ' << c.y << " -> " << (int)r << ") ";
+            }
+            std::cout << '\n';
         }
     }
 }
@@ -64,7 +64,7 @@ void Map::draw_(UnorderedMap& drawing, const UnorderedSet& restricted_area, cons
 
     for (uint64_t y = coords.y; y < bottom_wall; ++y) {
         for (uint64_t x = coords.x; x < right_wall; ++x) {
-            if (restricted_area.find(coords) == restricted_area.end()) {
+            if (restricted_area.find({x, y}) == restricted_area.end()) {
                 drawing[{x, y}] = get_rate_(restricted_area, {x, y});
             }
         }
@@ -91,11 +91,11 @@ void Map::update_drawing_(UnorderedMap& drawing, UnorderedSet& restricted_area, 
         return true;
     };
 
-    // std::cout << "Look the drawing BEFORE\n";
-    // for (const auto& [c, r] : drawing) {
-    //     std::cout << "(" << c.x << ' ' << c.y << " -> " << (int)r << ") ";
-    // }
-    // std::cout << '\n';
+    std::cout << "Look the drawing BEFORE\n";
+    for (const auto& [c, r] : drawing) {
+        std::cout << "(" << c.x << ' ' << c.y << " -> " << (int)r << ") ";
+    }
+    std::cout << '\n';
 
     for (int8_t x = -1; x < width + 1; x += 3) {
         if (!atX(coords.x, x)) {
@@ -113,11 +113,11 @@ void Map::update_drawing_(UnorderedMap& drawing, UnorderedSet& restricted_area, 
         draw_(drawing, restricted_area, {right_line, coords.y + y});
     }
 
-    // std::cout << "Look the drawing AFTER\n";
-    // for (const auto& [c, r] : drawing) {
-    //     std::cout << "(" << c.x << ' ' << c.y << " -> " << (int)r << ") ";
-    // }
-    // std::cout << '\n';
+    std::cout << "Look the drawing AFTER\n";
+    for (const auto& [c, r] : drawing) {
+        std::cout << "(" << c.x << ' ' << c.y << " -> " << (int)r << ") ";
+    }
+    std::cout << '\n';
 }
 
 uint8_t Map::get_rate_(const UnorderedSet& restricted_area, const Coords& coords) const {
@@ -181,11 +181,11 @@ void Map::update_restricted_area_(UnorderedMap& drawing, UnorderedSet& restricte
     uint8_t width = 1 + (type - 1) * !rotate;
     uint8_t height = 1 + (type - 1) * rotate;
 
-    // std::cout << "Look the restricted area BEFORE\n";
-    // for (const auto& c : restricted_area) {
-    //     std::cout << "(" << c.x << ' ' << c.y << ") ";
-    // }
-    // std::cout << '\n';
+    std::cout << "Look the restricted area BEFORE\n";
+    for (const auto& c : restricted_area) {
+        std::cout << "(" << c.x << ' ' << c.y << ") ";
+    }
+    std::cout << '\n';
 
     for (int8_t y = -1; y != height + 1; ++y) {
         for (int8_t x = -1; x != width + 1; ++x) {
@@ -202,20 +202,20 @@ void Map::update_restricted_area_(UnorderedMap& drawing, UnorderedSet& restricte
         }
     }
 
-    //  clearing restricted area
-    for (auto iter = restricted_area.begin(); iter != restricted_area.end();) {
-        if (get_rate_(restricted_area, *iter) == 8) {
-            iter = restricted_area.erase(iter);
-        } else {
-            ++iter;
-        }
-    }
-
-    // std::cout << "Look the restricted area AFTER\n";
-    // for (const auto& c : restricted_area) {
-    //     std::cout << "(" << c.x << ' ' << c.y << ") ";
+    // //  clearing restricted area
+    // for (auto iter = restricted_area.begin(); iter != restricted_area.end();) {
+    //     if (get_rate_(restricted_area, *iter) == 8) {
+    //         iter = restricted_area.erase(iter);
+    //     } else {
+    //         ++iter;
+    //     }
     // }
-    // std::cout << '\n';
+
+    std::cout << "Look the restricted area AFTER\n";
+    for (const auto& c : restricted_area) {
+        std::cout << "(" << c.x << ' ' << c.y << ") ";
+    }
+    std::cout << '\n';
 }
 
 void Map::set_ship_(UnorderedMap& drawing, UnorderedSet& restricted_area, uint8_t type) {
@@ -230,9 +230,10 @@ void Map::set_ship_(UnorderedMap& drawing, UnorderedSet& restricted_area, uint8_
     if (maxs.empty()) return;  // safely out if we have no place.
 
     std::pair<Coords, ShipSetting>& choosen = maxs[0];
-    // std::cout << "CHOOSEN CORDS " << choosen.first.x << ' ' << choosen.first.y << '\n';
-    const auto& x = choosen.first.x;
-    const auto& y = choosen.first.y;
+    std::cout << "CHOOSEN CORDS " << choosen.first.x << ' ' << choosen.first.y << '\n';
+    const Coords& coords = choosen.first;
+    const auto& x = coords.x;
+    const auto& y = coords.y;
     for (uint8_t i = 0; i != type; ++i) {
         if (choosen.second.rotate) {  // vertical
             map_[{x, y + i}] = 1;
@@ -241,11 +242,11 @@ void Map::set_ship_(UnorderedMap& drawing, UnorderedSet& restricted_area, uint8_
         }
     }
 
-    // std::cout << "updating restricted area...\n";
-    update_restricted_area_(drawing, restricted_area, choosen.first, type, choosen.second.rotate);
+    std::cout << "updating restricted area...\n";
+    update_restricted_area_(drawing, restricted_area, coords, type, choosen.second.rotate);
 
-    // std::cout << "update drawing...\n";
-    update_drawing_(drawing, restricted_area, choosen.first, type, choosen.second.rotate);
+    std::cout << "update drawing...\n";
+    update_drawing_(drawing, restricted_area, coords, type, choosen.second.rotate);
 
 }
 

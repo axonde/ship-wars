@@ -15,7 +15,7 @@
 struct Dimension {
     uint64_t width_;
     uint64_t height_;
-    bool Empty();
+    bool Empty() const;
 };
 
 struct Coords {
@@ -30,11 +30,14 @@ struct Coords {
 
 class Map {
 /*
-    Warning: the given value to the constructor must be correct!
+    Map: creating and operating shifts / pixels.
 */
 public:
-    Map() = default;
+    Map(Dimension* dimension);
     Map(std::array<uint64_t, 5> ships, Dimension* dimension);
+
+    uint8_t Shot(const Coords& coords);  // 0 - miss, 1 - hit, 2 - kill
+    size_t GetSize() const;
 
     friend std::ostream& operator << (std::ostream& out, const Map& map);
 private:
@@ -48,7 +51,7 @@ private:
 
     using UnorderedMap = boost::unordered_flat_map<Coords, uint8_t, CoordsHash>;
     using UnorderedSet = boost::unordered_set<Coords, CoordsHash>;
-    UnorderedMap map_;
+    UnorderedSet map_;
     Dimension* dimension_ = nullptr;
 
     void draw_(UnorderedMap& drawing, const UnorderedSet& restricted_area, const Coords& coords);

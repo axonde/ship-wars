@@ -47,8 +47,13 @@ void Processor::Run() {
         }
         
         // SHOTS
-        else if (s_cmd[0] == "shot" && s_cmd.size() > 2) {
-            std::cout << YELLOW << "[PLUG]" << WHITE << " striking a blow on " << s_cmd[1] << ' ' << s_cmd[2] << ".\n" << RESET;
+        else if (s_cmd[0] == "shot" && s_cmd.size() > 2 && IsNumber(s_cmd[1]) && IsNumber(s_cmd[2]) && kernel_->IsStarted()) {
+            if (uint8_t shot = kernel_->Shot(
+                {static_cast<uint64_t>(std::stoll(s_cmd[1])), 
+                static_cast<uint64_t>(std::stoll(s_cmd[2]))
+            }); shot == 0) std::cout << "miss\n";
+            else if (shot == 1) std::cout << "hit\n";
+            else std::cout << "kill\n";
         } else if (s_cmd[0] == "shot") {
             std::cout << YELLOW << "[PLUG]" << WHITE << " return the X Y coords of the shot.\n" << RESET;
         }
@@ -57,9 +62,9 @@ void Processor::Run() {
         else if (s_cmd[0] == "finished") {
             std::cout << YELLOW << "[PLUG]" << WHITE << " return the status have the game finished: yes/no\n" << RESET;
         } else if (s_cmd[0] == "win") {
-            std::cout << YELLOW << "[PLUG]" << WHITE << " return the status have the game won: yes/no.\n" << RESET;
+            std::cout << YELLOW << "[PLUG]" << WHITE << " return the status have the game, are we won: yes/no.\n" << RESET;
         } else if (s_cmd[0] == "lose") {
-            std::cout << YELLOW << "[PLUG]" << WHITE << " return the status have the game lost: yes/no.\n" << RESET;
+            std::cout << (kernel_->IsLoose() ? "yes\n" : "no\n");
         }
         
         // PARSE
@@ -163,6 +168,10 @@ bool Processor::Start() {
     }
     kernel_->Start();
     return true;
+}
+
+uint8_t Processor::Shot(const Coords& coords) {
+    return kernel_->Shot(coords);
 }
 
 Processor::~Processor() {

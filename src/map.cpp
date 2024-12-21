@@ -1,6 +1,6 @@
 #include "include/map.h"
 
-bool Dimension::Empty() {
+bool Dimension::Empty() const {
     return width_ == 0 || height_ == 0;
 }
 
@@ -27,6 +27,8 @@ std::size_t Map::CoordsHash::operator () (const Coords& coords) const {
     return seed;
 }
 
+Map::Map(Dimension* dimension) : dimension_(dimension) {}
+
 Map::Map(std::array<uint64_t, 5> ships, Dimension* dimension) {
     dimension_ = dimension;
 
@@ -39,23 +41,28 @@ Map::Map(std::array<uint64_t, 5> ships, Dimension* dimension) {
 
     draw_(drawing, restricted_area, {0, 0});
 
-    std::cout << "Look the drawing\n";
-    for (const auto& [c, r] : drawing) {
-        std::cout << "(" << c.x << ' ' << c.y << " -> " << (int)r << ") ";
-    }
-    std::cout << '\n';
-
     for (uint8_t type = 4; type != 0; --type) {
         for (uint64_t i = 0; i != ships[type]; ++i) {
             set_ship_(drawing, restricted_area, type);
-
-            std::cout << "Look the drawing (after the ship setting) \n";
-            for (const auto& [c, r] : drawing) {
-                std::cout << "(" << c.x << ' ' << c.y << " -> " << (int)r << ") ";
-            }
-            std::cout << '\n';
         }
     }
+}
+
+size_t Map::GetSize() const {
+    return map_.size();
+}
+
+uint8_t Map::Shot(const Coords& coords) {
+    auto iter = map_.find(coords);
+    if (iter == map_.end()) return 0;
+    map_.erase(iter);
+    if ((!coords.IsTouchingTop() && map_.find({coords.x, coords.y - 1}) != map_.end())
+    || (!coords.IsTouchingRight(*dimension_) && map_.find({coords.x + 1, coords.y}) != map_.end())
+    || (!coords.IsTouchingBottom(*dimension_) && map_.find({coords.x, coords.y + 1}) != map_.end())
+    || (!coords.IsTouchingLeft() && map_.find({coords.x - 1, coords.y}) != map_.end())) {
+        return 1;
+    }
+    return 2;
 }
 
 void Map::draw_(UnorderedMap& drawing, const UnorderedSet& restricted_area, const Coords& coords) {
@@ -91,12 +98,6 @@ void Map::update_drawing_(UnorderedMap& drawing, UnorderedSet& restricted_area, 
         return true;
     };
 
-    std::cout << "Look the drawing BEFORE\n";
-    for (const auto& [c, r] : drawing) {
-        std::cout << "(" << c.x << ' ' << c.y << " -> " << (int)r << ") ";
-    }
-    std::cout << '\n';
-
     for (int8_t x = -1; x < width + 1; x += 3) {
         if (!atX(coords.x, x)) {
             x -= 2;  // x' = (x + 3) - 3 + 1 = (x + 3) - 2
@@ -112,12 +113,6 @@ void Map::update_drawing_(UnorderedMap& drawing, UnorderedSet& restricted_area, 
         }
         draw_(drawing, restricted_area, {right_line, coords.y + y});
     }
-
-    std::cout << "Look the drawing AFTER\n";
-    for (const auto& [c, r] : drawing) {
-        std::cout << "(" << c.x << ' ' << c.y << " -> " << (int)r << ") ";
-    }
-    std::cout << '\n';
 }
 
 uint8_t Map::get_rate_(const UnorderedSet& restricted_area, const Coords& coords) const {
@@ -181,12 +176,6 @@ void Map::update_restricted_area_(UnorderedMap& drawing, UnorderedSet& restricte
     uint8_t width = 1 + (type - 1) * !rotate;
     uint8_t height = 1 + (type - 1) * rotate;
 
-    std::cout << "Look the restricted area BEFORE\n";
-    for (const auto& c : restricted_area) {
-        std::cout << "(" << c.x << ' ' << c.y << ") ";
-    }
-    std::cout << '\n';
-
     for (int8_t y = -1; y != height + 1; ++y) {
         for (int8_t x = -1; x != width + 1; ++x) {
             if ((coords.IsTouchingTop() && y == -1)
@@ -201,21 +190,6 @@ void Map::update_restricted_area_(UnorderedMap& drawing, UnorderedSet& restricte
             restricted_area.insert({coords.x + x, coords.y + y});
         }
     }
-
-    // //  clearing restricted area
-    // for (auto iter = restricted_area.begin(); iter != restricted_area.end();) {
-    //     if (get_rate_(restricted_area, *iter) == 8) {
-    //         iter = restricted_area.erase(iter);
-    //     } else {
-    //         ++iter;
-    //     }
-    // }
-
-    std::cout << "Look the restricted area AFTER\n";
-    for (const auto& c : restricted_area) {
-        std::cout << "(" << c.x << ' ' << c.y << ") ";
-    }
-    std::cout << '\n';
 }
 
 void Map::set_ship_(UnorderedMap& drawing, UnorderedSet& restricted_area, uint8_t type) {
@@ -230,34 +204,31 @@ void Map::set_ship_(UnorderedMap& drawing, UnorderedSet& restricted_area, uint8_
     if (maxs.empty()) return;  // safely out if we have no place.
 
     std::pair<Coords, ShipSetting>& choosen = maxs[0];
-    std::cout << "CHOOSEN CORDS " << choosen.first.x << ' ' << choosen.first.y << '\n';
     const Coords& coords = choosen.first;
     const auto& x = coords.x;
     const auto& y = coords.y;
     for (uint8_t i = 0; i != type; ++i) {
         if (choosen.second.rotate) {  // vertical
-            map_[{x, y + i}] = 1;
+            map_.insert({x, y + i});
         } else {  // horizontal
-            map_[{x + i, y}] = 1;
+            map_.insert({x + i, y});
         }
     }
 
-    std::cout << "updating restricted area...\n";
     update_restricted_area_(drawing, restricted_area, coords, type, choosen.second.rotate);
 
-    std::cout << "update drawing...\n";
     update_drawing_(drawing, restricted_area, coords, type, choosen.second.rotate);
 
 }
 
 std::ostream& operator << (std::ostream& out, const Map& map) {
-    std::vector<std::pair<Coords, uint8_t>> buffer(map.map_.begin(), map.map_.end());  // copy pair, cause can implemet more effect out
-    std::sort(buffer.begin(), buffer.end(), [](const std::pair<Coords, uint8_t>& lhs, const std::pair<Coords, uint8_t>& rhs) {
-        return std::tie(lhs.first.y, lhs.first.x) > std::tie(rhs.first.y, rhs.first.x);
+    std::vector<Coords> buffer(map.map_.begin(), map.map_.end());  // copy pair, cause can implemet more effect out
+    std::sort(buffer.begin(), buffer.end(), [](const Coords& lhs, const Coords& rhs) {
+        return std::tie(lhs.y, lhs.x) > std::tie(rhs.y, rhs.x);
     });
     for (size_t y = 0; y != map.dimension_->height_; ++y) {
         for (size_t x = 0; x != map.dimension_->width_; ++x) {
-            if (!buffer.empty() && x == buffer.rbegin()->first.x && y == buffer.rbegin()->first.y) {
+            if (!buffer.empty() && x == buffer.rbegin()->x && y == buffer.rbegin()->y) {
                 out << "⏚ ";
                 buffer.erase(std::prev(buffer.end()));
             } else {
@@ -268,11 +239,3 @@ std::ostream& operator << (std::ostream& out, const Map& map) {
     }
     return out;
 }
-
-
-// create master
-// set width 6
-// set height 6
-// set count 4 1
-// set count 2 2
-// start

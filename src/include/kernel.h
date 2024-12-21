@@ -15,13 +15,19 @@ public:
     bool SetCount(uint8_t type, uint64_t count);
     bool SetStrategy(uint8_t strategy);
 
-    uint64_t GetWidth();
-    uint64_t GetHeight();
-    uint64_t GetCount(uint8_t type);
+    uint64_t GetWidth() const;
+    uint64_t GetHeight() const;
+    uint64_t GetCount(uint8_t type) const;
+    const Map& GetMap() const ;
+    const Map& GetEnemyMap() const;
 
-    bool IsReady();
-    bool IsStarted();
+    bool IsReady() const;
+    bool IsStarted() const;
+    bool IsLoose() const;
+
     void Start();
+
+    uint8_t Shot(const Coords& coords);
 
     ~Kernel();
 private:

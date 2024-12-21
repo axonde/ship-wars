@@ -17,4 +17,5 @@ namespace Help {
     void ErrorUnknowCmd();
     void ErrorStrategyParsing();
     void ErrorWhileGetting();
+    void ErrorKernelOff();
 }

@@ -27,3 +27,6 @@ void Help::ErrorStrategyParsing() {
 void Help::ErrorWhileGetting() {
     std::cout << RED << "[ERROR]" << WHITE << " Can't get the given parameters.\n" << RESET;
 }
+void Help::ErrorKernelOff() {
+    std::cout << PURPLE << "[WARNING]" << WHITE << " The game is not lunch.\n" << RESET;
+}

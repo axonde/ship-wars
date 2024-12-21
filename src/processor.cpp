@@ -45,6 +45,17 @@ void Processor::Run() {
         else if (s_cmd[0] == "get" && s_cmd.size() > 1) {
             Get(s_cmd);
         }
+
+        // PARSE
+        else if (s_cmd[0] == "dump" && s_cmd.size() > 1) {
+            std::cout << YELLOW << "[PLUG]" << WHITE << " dump the created map to: " << s_cmd[1] << "\n" << RESET;
+        } else if (s_cmd[0] == "load" && s_cmd.size() > 1) {
+            std::cout << YELLOW << "[PLUG]" << WHITE << " uploading the game setting from: " << s_cmd[1] << "\n" << RESET;
+        }
+
+        else if (!kernel_->IsStarted()) {
+            Help::ErrorKernelOff();
+        }
         
         // SHOTS
         else if (s_cmd[0] == "shot" && s_cmd.size() > 2 && IsNumber(s_cmd[1]) && IsNumber(s_cmd[2]) && kernel_->IsStarted()) {
@@ -65,13 +76,6 @@ void Processor::Run() {
             std::cout << YELLOW << "[PLUG]" << WHITE << " return the status have the game, are we won: yes/no.\n" << RESET;
         } else if (s_cmd[0] == "lose") {
             std::cout << (kernel_->IsLoose() ? "yes\n" : "no\n");
-        }
-        
-        // PARSE
-        else if (s_cmd[0] == "dump" && s_cmd.size() > 1) {
-            std::cout << YELLOW << "[PLUG]" << WHITE << " dump the created map to: " << s_cmd[1] << "\n" << RESET;
-        } else if (s_cmd[0] == "load" && s_cmd.size() > 1) {
-            std::cout << YELLOW << "[PLUG]" << WHITE << " uploading the game setting from: " << s_cmd[1] << "\n" << RESET;
         }
         
         else {

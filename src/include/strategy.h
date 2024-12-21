@@ -1,13 +1,34 @@
 #pragma once
 #include <array>
 #include <cstdint>
-#include <iostream>
-#include "utils.h"
+#include <boost/random.hpp>
+#include <boost/unordered_set.hpp>
+#include <numeric>
+#include "map.h"
 
 class Strategy {
 public:
-    bool SetType(uint8_t type);
+    void Set(Dimension* dimension, const std::array<uint64_t, 5>& ships);
+    uint64_t GetWidth() const;
+    uint64_t GetHeight() const;
+    void HitShip();
+    virtual Coords Next() = 0;
 private:
-    std::array<uint8_t, 2> types_ = {0, 1};  // 0 - orderred, 1 - custom
-    uint8_t type_ = 1;
+    uint64_t ships_sum_;
+    Dimension* dimension_ = nullptr;
+};
+
+class OrderedStrategy : public Strategy {
+public:
+    Coords Next();
+private:
+    Coords coords_ = {0, 0};
+};
+
+class CustomStrategy : public Strategy {
+public:
+    Coords Next();
+private:
+    using UnorderedSet = boost::unordered_set<Coords, CoordsHash>;
+    UnorderedSet restricted_area_;
 };

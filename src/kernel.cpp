@@ -19,8 +19,12 @@ bool Kernel::SetCount(uint8_t type, uint64_t count) {
     ships_[type] = count;
     return true;
 }
-bool Kernel::SetStrategy(uint8_t type) {
-    return strategy_.SetType(type);
+
+void Kernel::SetOrderedStrategy() {
+    strategy_ = new OrderedStrategy;
+}
+void Kernel::SetCustomStrategy() {
+    strategy_ = new CustomStrategy;
 }
 
 uint64_t Kernel::GetWidth() const {
@@ -35,13 +39,13 @@ uint64_t Kernel::GetCount(uint8_t type) const {
     }
     return ships_[type];
 }
-
 const Map& Kernel::GetMap() const {
     return *map_;
 }
-const Map& Kernel::GetEnemyMap() const {
-    return *enemy_;
+Coords Kernel::GetMove() const {
+    return strategy_->Next();
 }
+
 
 bool Kernel::IsReady() const {
     if (dimension_.Empty() || std::all_of(ships_.begin(), ships_.end(), [](const auto& x) {return x == 0;})) {
@@ -52,16 +56,21 @@ bool Kernel::IsReady() const {
 bool Kernel::IsStarted() const {
     return started_;
 }
-
 bool Kernel::IsLoose() const {
     return map_->GetSize() == 0;
+}
+bool Kernel::IsStrategySet() const {
+    return strategy_ != nullptr;
 }
 
 void Kernel::Start() {
     map_ = new Map(ships_, &dimension_);
-    enemy_ = new Map(&dimension_);
     started_ = true;
+    strategy_->Set(&dimension_, ships_);
     std::cout << *map_;
+}
+void Kernel::HitShip() {
+    strategy_->HitShip();
 }
 
 uint8_t Kernel::Shot(const Coords& coords) {
@@ -72,7 +81,7 @@ Kernel::~Kernel() {
     if (map_ != nullptr) {
         delete map_;
     }
-    if (enemy_ != nullptr) {
-        delete enemy_;
+    if (strategy_ != nullptr) {
+        delete strategy_;
     }
 }

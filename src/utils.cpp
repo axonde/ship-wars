@@ -1,32 +1,36 @@
 #include "include/utils.h"
 
-void Help::ErrorSet() {
+void Out::Welcome() {
+    std::cout << "🏴‍☠️ Welcome to Ship Wars!\n";
+}
+
+void Out::ErrorSet() {
     std::cout << PURPLE << "[WARNING]" << WHITE << " You are only able to set width, height, count, strategy, and result.\n" << RESET;
 }
-void Help::ErrorPlayerIsSet() {
+void Out::ErrorPlayerIsSet() {
     std::cout << RED << "[ERROR]" << WHITE << " The player is already set.\n" << RESET;
 }
-void Help::ErrorPlayerIsUnset() {
+void Out::ErrorPlayerIsUnset() {
     std::cout << PURPLE << "[WARNING]" << WHITE << " You aren't able to set any game settings while the type of the player is unset.\n" << RESET;
 }
-void Help::ErrorPlayerIncorrect() {
+void Out::ErrorPlayerIncorrect() {
     std::cout << PURPLE << "[WARNING]" << WHITE << " You are only able to set master or slave player's type.\n" << RESET;
 }
-void Help::ErrorStrategy() {
+void Out::ErrorStrategy() {
     std::cout << PURPLE << "[WARNING]" << WHITE << " You are only able to set ordered or custom stategy.\n" << RESET;
 }
-void Help::ErrorResult() {
+void Out::ErrorStrategyIsAlreadySet() {
+    std::cout << RED << "[ERROR]" << WHITE << " You already set the strategy. If you want to change it, restart the program :(\n" << RESET;
+}
+void Out::ErrorResult() {
     std::cout << PURPLE << "[WARNING]" << WHITE << " You are only able to miss, hit, or kill opponent.\n" << RESET;
 }
-void Help::ErrorUnknowCmd() {
+void Out::ErrorUnknowCmd() {
     std::cout << PURPLE << "[WARNING]" << WHITE << " Unknow command.\n" << RESET;
 }
-void Help::ErrorStrategyParsing() {
-    std::cout << RED << "[ERROR]" << WHITE << " Try to set inexistable ship's type.\n" << RESET;
-}
-void Help::ErrorWhileGetting() {
+void Out::ErrorGet() {
     std::cout << RED << "[ERROR]" << WHITE << " Can't get the given parameters.\n" << RESET;
 }
-void Help::ErrorKernelOff() {
+void Out::ErrorKernelOff() {
     std::cout << PURPLE << "[WARNING]" << WHITE << " The game is not lunch.\n" << RESET;
 }

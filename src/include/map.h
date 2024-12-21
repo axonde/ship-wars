@@ -28,6 +28,10 @@ struct Coords {
     bool IsTouchingLeft() const;
 };
 
+struct CoordsHash {
+    std::size_t operator () (const Coords& coords) const;
+};
+
 class Map {
 /*
     Map: creating and operating shifts / pixels.
@@ -41,9 +45,6 @@ public:
 
     friend std::ostream& operator << (std::ostream& out, const Map& map);
 private:
-    struct CoordsHash {
-        std::size_t operator () (const Coords& coords) const;
-    };
     struct ShipSetting {
         uint8_t rate;
         bool rotate;  // false - horizontal, true - vertical

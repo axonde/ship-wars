@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "map.h"
 #include "kernel.h"
 #include "utils.h"
 
@@ -13,7 +14,7 @@ public:
     bool Set(const std::vector<std::string>& s_cmd);
     void Get(const std::vector<std::string>& s_cmd);
     bool Start();
-    uint8_t Shot(const Coords& coords);
+    void Shot(const std::vector<std::string>& s_cmd);
 
     static std::vector<std::string> Split(const std::string& str, char delimiter) {
         std::vector<std::string> arr;

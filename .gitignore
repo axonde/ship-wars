@@ -31,5 +31,9 @@
 *.out
 *.app
 
-# build
+# Build
 build/
+
+# Project
+.vscode/
+.DS_Store

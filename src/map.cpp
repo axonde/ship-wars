@@ -31,6 +31,7 @@ Map::Map(Dimension* dimension) : dimension_(dimension) {}
 
 Map::Map(std::array<uint64_t, 5> ships, Dimension* dimension) {
     dimension_ = dimension;
+    ships_sum_ = std::accumulate(ships.begin(), ships.end(), 0, std::plus<uint64_t>());
 
     boost::random::mt19937 generator(static_cast<unsigned>(std::time(0)));
     boost::random::uniform_int_distribution<> distribution(1, 4);
@@ -48,14 +49,11 @@ Map::Map(std::array<uint64_t, 5> ships, Dimension* dimension) {
     }
 }
 
-size_t Map::GetSize() const {
-    return map_.size();
-}
-
-uint8_t Map::Shot(const Coords& coords) {
+uint8_t Map::HitShip(const Coords& coords) {
     auto iter = map_.find(coords);
     if (iter == map_.end()) return 0;
     map_.erase(iter);
+    --ships_sum_;
     if ((!coords.IsTouchingTop() && map_.find({coords.x, coords.y - 1}) != map_.end())
     || (!coords.IsTouchingRight(*dimension_) && map_.find({coords.x + 1, coords.y}) != map_.end())
     || (!coords.IsTouchingBottom(*dimension_) && map_.find({coords.x, coords.y + 1}) != map_.end())
@@ -65,7 +63,11 @@ uint8_t Map::Shot(const Coords& coords) {
     return 2;
 }
 
-void Map::draw_(UnorderedMap& drawing, const UnorderedSet& restricted_area, const Coords& coords) {
+size_t Map::GetSize() const {
+    return map_.size();
+}
+
+void Map::draw_(UnorderedMap& drawing, const UnorderedSet& restricted_area, const Coords& coords) const {
     uint64_t right_wall = std::min(dimension_->width_, coords.x + 4);
     uint64_t bottom_wall = std::min(dimension_->height_, coords.y + 4);
 
@@ -78,7 +80,7 @@ void Map::draw_(UnorderedMap& drawing, const UnorderedSet& restricted_area, cons
     }
 }
 
-void Map::update_drawing_(UnorderedMap& drawing, UnorderedSet& restricted_area, const Coords& coords, uint8_t type, bool rotate) {
+void Map::update_drawing_(UnorderedMap& drawing, UnorderedSet& restricted_area, const Coords& coords, uint8_t type, bool rotate) const {
     uint8_t width = 1 + (type - 1) * !rotate;
     uint8_t height = 1 + (type - 1) * rotate;
 
@@ -132,7 +134,7 @@ uint8_t Map::get_rate_(const UnorderedSet& restricted_area, const Coords& coords
     return rate;
 }
 
-void Map::choose_pixels_(const UnorderedMap& drawing, std::vector<std::pair<Coords, ShipSetting>>& maxs, uint8_t type) {
+void Map::choose_pixels_(const UnorderedMap& drawing, std::vector<std::pair<Coords, ShipSetting>>& maxs, uint8_t type) const {
     using FuncRes = std::pair<ShipSetting, bool>;
 
     std::function<FuncRes(const Coords&)> can_be_horizontal = [&](const Coords& coords) {
@@ -172,7 +174,7 @@ void Map::choose_pixels_(const UnorderedMap& drawing, std::vector<std::pair<Coor
     }
 }
 
-void Map::update_restricted_area_(UnorderedMap& drawing, UnorderedSet& restricted_area, const Coords& coords, uint8_t type, bool rotate) {
+void Map::update_restricted_area_(UnorderedMap& drawing, UnorderedSet& restricted_area, const Coords& coords, uint8_t type, bool rotate) const {
     uint8_t width = 1 + (type - 1) * !rotate;
     uint8_t height = 1 + (type - 1) * rotate;
 
@@ -218,7 +220,6 @@ void Map::set_ship_(UnorderedMap& drawing, UnorderedSet& restricted_area, uint8_
     update_restricted_area_(drawing, restricted_area, coords, type, choosen.second.rotate);
 
     update_drawing_(drawing, restricted_area, coords, type, choosen.second.rotate);
-
 }
 
 std::ostream& operator << (std::ostream& out, const Map& map) {

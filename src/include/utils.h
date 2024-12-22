@@ -10,7 +10,8 @@ namespace Out {
 
     void Welcome();
     
-    void ErrorKernelOff();
+    void ErrorKernelIsOff();
+    void WarningKernelIsAlreadyStopped();
 
     void ErrorSet();
 

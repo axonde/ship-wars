@@ -1,28 +1,34 @@
 #include "include/strategy.h"
 
-void Strategy::Set(Dimension* dimension, const std::array<uint64_t, 5>& ships) {
+Strategy::Strategy(Dimension* dimension) {
     dimension_ = dimension;
-    ships_sum_ = std::accumulate(ships.begin(), ships.end(), 0, std::plus<uint64_t>());
 }
 uint64_t Strategy::GetWidth() const {
-    return dimension_->width_;
+    if (dimension_ != nullptr) {
+        return dimension_->width_;
+    }
+    return 0;
 }
 uint64_t Strategy::GetHeight() const {
-    return dimension_->height_;
+    if (dimension_ != nullptr) {
+        return dimension_->height_;
+    }
+    return 0;
 }
-void Strategy::HitShip() {
-    if (ships_sum_ > 0)
+void Strategy::SetShot() {
+    if (ships_sum_ > 0) {
         --ships_sum_;
+    }
 }
 
-Coords OrderedStrategy::Next() {
+Coords OrderedStrategy::Shot() {
     Coords coords_out = coords_;
     coords_.x = (coords_.x + 1) % GetWidth();
     coords_.y = (coords_.y + 1 * (coords_.x == 0)) % GetHeight();
     return coords_out;
 }
 
-Coords CustomStrategy::Next() {
+Coords CustomStrategy::Shot() {
     /*
         very bad choice if you have big dimension and a small quantity of avaible pixel...
         --> u will just iterate it all!! <--
@@ -42,7 +48,10 @@ Coords CustomStrategy::Next() {
     
     boost::random::mt19937 generator(static_cast<unsigned>(std::time(0)));
     boost::random::uniform_int_distribution<> distribution(0, 39);
-    const Coords& choosen_coords = avaible_coords[distribution(generator)];
+    if (avaible_coords.size() == 0) {
+        return {0, 0};  // define the UB
+    }
+    const Coords& choosen_coords = avaible_coords[std::min(static_cast<size_t>(distribution(generator)), avaible_coords.size() - 1)];
     restricted_area_.insert(choosen_coords);
     return choosen_coords;
 }

@@ -9,12 +9,16 @@
 class Processor {
 public:
     void Run();
-    void Test();
+    void Test() const;
     bool Create(const std::vector<std::string>& s_cmd);
     bool Set(const std::vector<std::string>& s_cmd);
-    void Get(const std::vector<std::string>& s_cmd);
-    bool Start();
-    void Shot(const std::vector<std::string>& s_cmd);
+    void Get(const std::vector<std::string>& s_cmd) const;
+    void Start();
+    void Stop();
+    void HitShip(const std::vector<std::string>& s_cmd);
+    void Shot();
+
+    void IsLose() const;
 
     static std::vector<std::string> Split(const std::string& str, char delimiter) {
         std::vector<std::string> arr;

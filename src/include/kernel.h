@@ -15,26 +15,28 @@ public:
     bool SetCount(uint8_t type, uint64_t count);
     void SetOrderedStrategy();
     void SetCustomStrategy();
+    void SetShot();
 
     uint64_t GetWidth() const;
     uint64_t GetHeight() const;
     uint64_t GetCount(uint8_t type) const;
-    const Map& GetMap() const ;
-    Coords GetMove() const;
+    const Map& GetMap() const;
 
     bool IsReady() const;
     bool IsStarted() const;
-    bool IsLoose() const;
+    bool IsStopped() const;
+    bool IsLose() const;
     bool IsStrategySet() const;
 
     void Start();
-    void HitShip();
-
-    uint8_t Shot(const Coords& coords);
+    void Stop();
+    uint8_t HitShip(const Coords& coords);
+    Coords Shot();
 
     ~Kernel();
 private:
     bool started_ = false;
+    bool stopped_ = false;
     bool type_;  // тип игрока: 0 - slave; 1 - master
     Dimension dimension_;  // размерность поля
     Strategy* strategy_ = nullptr;  // выбранная стратегия

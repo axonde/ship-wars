@@ -44,10 +44,13 @@ uint64_t Kernel::GetCount(uint8_t type) const {
 const Map& Kernel::GetMap() const {
     return *map_;
 }
+const bool Kernel::GetType() const {
+    return type_;
+}
 
 
 bool Kernel::IsReady() const {
-    if (dimension_.Empty() || std::all_of(ships_.begin(), ships_.end(), [](const auto& x) {return x == 0;})) {
+    if (!type_ && (dimension_.Empty() || std::all_of(ships_.begin(), ships_.end(), [](const auto& x) {return x == 0;}))) {
         return false;
     }
     return true;
@@ -58,6 +61,9 @@ bool Kernel::IsStarted() const {
 bool Kernel::IsStopped() const {
     return stopped_;
 }
+bool Kernel::IsWin() const {
+    return strategy_->GetShipsSum() == 0;
+}
 bool Kernel::IsLose() const {
     return map_->GetSize() == 0;
 }
@@ -66,10 +72,15 @@ bool Kernel::IsStrategySet() const {
 }
 
 void Kernel::Start() {
-    map_ = new Map(ships_, &dimension_);
     if (strategy_ == nullptr) {
         strategy_ = new CustomStrategy(&dimension_);
     }
+    if (type_) {  // we are master -> generate the dimension.
+        Generated generated = strategy_->Generate();
+        dimension_ = generated.dimension_;
+        ships_ = generated.ships_;
+    }
+    map_ = new Map(ships_, &dimension_);
     started_ = true;
     std::cout << *map_;
 }

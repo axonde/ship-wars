@@ -21,10 +21,12 @@ public:
     uint64_t GetHeight() const;
     uint64_t GetCount(uint8_t type) const;
     const Map& GetMap() const;
+    const bool GetType() const;
 
     bool IsReady() const;
     bool IsStarted() const;
     bool IsStopped() const;
+    bool IsWin() const;
     bool IsLose() const;
     bool IsStrategySet() const;
 

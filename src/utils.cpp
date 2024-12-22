@@ -12,11 +12,21 @@ void Out::WarningKernelIsAlreadyStopped() {
 }
 
 void Out::ErrorSet() {
-    std::cout << PURPLE << "[WARNING]" << WHITE << " You are only able to set width, height, count, strategy, and result.\n" << RESET;
+    std::cout << PURPLE << "[WARNING]" << WHITE << " NO! You are setting somes for master player or try to set count of potatoes.\n" << RESET;
 }
 
+void Out::ErrorEarlierMasterGetting() {
+    std::cout << RED << "[ERROR]" << WHITE << " So... no. I will repeat it once. You can't get smth " << RED << "while the game hasn't started 😡\n" << RESET;
+}
 void Out::ErrorGet() {
-    std::cout << RED << "[ERROR]" << WHITE << " Can't get the given parameters.\n" << RESET;
+    std::cout << RED << "[ERROR]" << WHITE << " 1) You need to have a normal tone. 2) Maybe you try to get avocados(not here pls) or setting " << RED << "while the game is not start?\n" << RESET;
+}
+
+void Out::ErrorResult() {
+    std::cout << PURPLE << "[WARNING]" << WHITE << " No, no, no. The game isn't lunch or is stopped and you try to confuse me.\n" << RESET;
+}
+void Out::ErrorResultCmd() {
+    std::cout << PURPLE << "[WARNING]" << WHITE << " You are only able to miss, hit, or kill opponent.\n" << RESET;
 }
 
 void Out::ErrorPlayerIsSet() {
@@ -36,9 +46,6 @@ void Out::ErrorStrategyIsAlreadySet() {
     std::cout << RED << "[ERROR]" << WHITE << " You already set the strategy. If you want to change it, restart the program :(\n" << RESET;
 }
 
-void Out::ErrorResult() {
-    std::cout << PURPLE << "[WARNING]" << WHITE << " You are only able to miss, hit, or kill opponent.\n" << RESET;
-}
 void Out::ErrorUnknowCmd() {
     std::cout << PURPLE << "[WARNING]" << WHITE << " Unknow command.\n" << RESET;
 }

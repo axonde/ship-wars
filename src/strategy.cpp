@@ -15,6 +15,9 @@ uint64_t Strategy::GetHeight() const {
     }
     return 0;
 }
+uint64_t Strategy::GetShipsSum() const {
+    return ships_sum_;
+}
 void Strategy::SetShot() {
     if (ships_sum_ > 0) {
         --ships_sum_;
@@ -26,6 +29,12 @@ Coords OrderedStrategy::Shot() {
     coords_.x = (coords_.x + 1) % GetWidth();
     coords_.y = (coords_.y + 1 * (coords_.x == 0)) % GetHeight();
     return coords_out;
+}
+Generated OrderedStrategy::Generate() {
+    Generated generated;
+    generated.dimension_ = {4 * 30 + 29, 101};
+    generated.ships_ = {0, 0, 0, 0, 51 * 30};
+    return generated;
 }
 
 Coords CustomStrategy::Shot() {
@@ -54,4 +63,17 @@ Coords CustomStrategy::Shot() {
     const Coords& choosen_coords = avaible_coords[std::min(static_cast<size_t>(distribution(generator)), avaible_coords.size() - 1)];
     restricted_area_.insert(choosen_coords);
     return choosen_coords;
+}
+Generated CustomStrategy::Generate() {
+    boost::random::mt19937 generator(static_cast<unsigned>(std::time(0)));
+    boost::random::uniform_int_distribution<> distribution_size(15, 100);
+    boost::random::uniform_int_distribution<> distribution_ships(2, 10);
+
+    Generated generated;
+    uint64_t size = distribution_size(generator);
+    generated.dimension_ = {size, size};
+    for (uint8_t i = 1; i != 5; ++i) {
+        generated.ships_[i] = distribution_ships(generator);
+    }
+    return generated;
 }

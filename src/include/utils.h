@@ -16,6 +16,10 @@ namespace Out {
     void ErrorSet();
 
     void ErrorGet();
+    void ErrorEarlierMasterGetting();
+
+    void ErrorResult();
+    void ErrorResultCmd();
 
     void ErrorPlayerIsSet();
     void ErrorPlayerIsUnset();
@@ -24,6 +28,5 @@ namespace Out {
     void ErrorStrategy();
     void ErrorStrategyIsAlreadySet();
 
-    void ErrorResult();
     void ErrorUnknowCmd();
 }

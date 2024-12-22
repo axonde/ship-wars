@@ -11,14 +11,16 @@ public:
     void Run();
     void Test() const;
     bool Create(const std::vector<std::string>& s_cmd);
-    bool Set(const std::vector<std::string>& s_cmd);
+    void Set(const std::vector<std::string>& s_cmd);
     void Get(const std::vector<std::string>& s_cmd) const;
     void Start();
     void Stop();
     void HitShip(const std::vector<std::string>& s_cmd);
     void Shot();
 
+    void IsWin() const;
     void IsLose() const;
+    void IsFinished() const;
 
     static std::vector<std::string> Split(const std::string& str, char delimiter) {
         std::vector<std::string> arr;

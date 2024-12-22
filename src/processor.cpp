@@ -9,28 +9,19 @@ void Processor::Run() {
         std::getline(std::cin, cmd);
         s_cmd = Split(cmd, ' ');
 
-        std::string RED = "\e[1;31m";
-        std::string YELLOW = "\e[1;33m";
-        std::string PURPLE = "\e[1;35m";
-        std::string WHITE = "\e[97m";
-        std::string RESET = "\e[0m";
-
         if (s_cmd[0] == "exit") {
             break;
         } else if (s_cmd[0] == "ping") {
             Test();
-        } 
+        }
 
         // CREATE
         else if (s_cmd[0] == "create" && s_cmd.size() > 1) {
-            if (!Create(s_cmd)) {
-                continue;
-            }
+            Create(s_cmd);
         }
 
         else if (kernel_ == nullptr) {
             Out::ErrorPlayerIsUnset();
-            continue;
         }
         
         // START & STOP
@@ -42,9 +33,7 @@ void Processor::Run() {
         
         // SETTERS
         else if (s_cmd[0] == "set" && s_cmd.size() > 2) {
-            if (!Set(s_cmd)) {
-                continue;
-            }
+            Set(s_cmd);
         }
         
         // GETTERS
@@ -54,21 +43,20 @@ void Processor::Run() {
 
         // PARSE
         else if (s_cmd[0] == "dump" && s_cmd.size() > 1) {
-            std::cout << YELLOW << "[PLUG]" << WHITE << " dump the created map to: " << s_cmd[1] << "\n" << RESET;
+            std::cout << Out::YELLOW << "[PLUG]" << Out::WHITE << " dump the created map to: " << s_cmd[1] << "\n" << Out::RESET;
         } else if (s_cmd[0] == "load" && s_cmd.size() > 1) {
-            std::cout << YELLOW << "[PLUG]" << WHITE << " uploading the game setting from: " << s_cmd[1] << "\n" << RESET;
+            std::cout << Out::YELLOW << "[PLUG]" << Out::WHITE << " uploading the game setting from: " << s_cmd[1] << "\n" << Out::RESET;
         }
 
         else if (!kernel_->IsStarted()) {
             Out::ErrorKernelIsOff();
-            continue;
         }
         
         // STATUS
         else if (s_cmd[0] == "finished") {
-            std::cout << YELLOW << "[PLUG]" << WHITE << " return the status have the game finished: yes/no\n" << RESET;
+            IsFinished();
         } else if (s_cmd[0] == "win") {
-            std::cout << YELLOW << "[PLUG]" << WHITE << " return the status have the game, are we won: yes/no.\n" << RESET;
+            IsWin();
         } else if (s_cmd[0] == "lose") {
             IsLose();
         }
@@ -112,11 +100,11 @@ bool Processor::Create(const std::vector<std::string>& s_cmd) {
     return true;
 }
 
-bool Processor::Set(const std::vector<std::string>& s_cmd) {
+void Processor::Set(const std::vector<std::string>& s_cmd) {
     if (s_cmd[1] == "result") {
         if (!kernel_->IsStarted() || kernel_->IsStopped()) {
             Out::ErrorResult();
-            return false;
+            return;
         }
         else if (s_cmd[2] == "hit" || s_cmd[2] == "kill") {
             kernel_->SetShot();
@@ -124,14 +112,12 @@ bool Processor::Set(const std::vector<std::string>& s_cmd) {
         if (s_cmd[2] == "miss" || s_cmd[2] == "hit" || s_cmd[2] == "kill") {
             std::cout << "ok\n";
         } else {
-            Out::ErrorResult();
-            return false;
+            Out::ErrorResultCmd();
         }
     }
 
     else if (kernel_->IsStarted() || kernel_->IsStopped()) {
         Out::ErrorSet();
-        return false;
     }
 
     else if (s_cmd[1] == "strategy") {
@@ -148,10 +134,9 @@ bool Processor::Set(const std::vector<std::string>& s_cmd) {
         }
     }
 
-    else if (s_cmd[1] == "width" || s_cmd[1] == "height" || s_cmd[1] == "count") {
+    else if ((s_cmd[1] == "width" || s_cmd[1] == "height" || s_cmd[1] == "count") && !kernel_->GetType()) {
         if (!IsNumber(s_cmd[2]) || !(!(s_cmd.size() > 3) || IsNumber(s_cmd[3]))) {
             std::cout << "failed\n";
-            return false;
         }
         if (s_cmd[1] == "width") {
             std::cout << (kernel_->SetWidth(std::stoll(s_cmd[2])) ? "ok\n" : "failed\n");
@@ -165,10 +150,13 @@ bool Processor::Set(const std::vector<std::string>& s_cmd) {
     else {
         Out::ErrorSet();
     }
-    return true;
 }
 
 void Processor::Get(const std::vector<std::string>& s_cmd) const {
+    if (!kernel_->IsStarted()) {
+        Out::ErrorEarlierMasterGetting();
+        return;
+    }
     if (s_cmd[1] == "width") {
         std::cout << kernel_->GetWidth() << '\n';
     } else if (s_cmd[1] == "height") {
@@ -218,8 +206,14 @@ void Processor::Shot() {
     std::cout << shot.x << ' ' << shot.y << '\n';
 }
 
+void Processor::IsWin() const {
+    std::cout << (kernel_->IsWin() ? "yes\n" : "no\n");
+}
 void Processor::IsLose() const {
     std::cout << (kernel_->IsLose() ? "yes\n" : "no\n");
+}
+void Processor::IsFinished() const {
+    std::cout << (kernel_->IsWin() || kernel_->IsLose() ? "yes\n" : "no\n");
 }
 
 Processor::~Processor() {

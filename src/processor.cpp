@@ -43,9 +43,9 @@ void Processor::Run() {
 
         // PARSE
         else if (s_cmd[0] == "dump" && s_cmd.size() > 1) {
-            std::cout << Out::YELLOW << "[PLUG]" << Out::WHITE << " dump the created map to: " << s_cmd[1] << "\n" << Out::RESET;
+            Dump(s_cmd);
         } else if (s_cmd[0] == "load" && s_cmd.size() > 1) {
-            std::cout << Out::YELLOW << "[PLUG]" << Out::WHITE << " uploading the game setting from: " << s_cmd[1] << "\n" << Out::RESET;
+            Load(s_cmd);
         }
 
         else if (!kernel_->IsStarted()) {
@@ -71,6 +71,10 @@ void Processor::Run() {
             HitShip(s_cmd);
         } else if (s_cmd[0] == "shot") {
             Shot();
+        }
+
+        else if (s_cmd[0] == "print") {
+            Out::PrintMap(kernel_);
         }
         
         else {
@@ -204,6 +208,21 @@ void Processor::HitShip(const std::vector<std::string>& s_cmd) {
 void Processor::Shot() {
     Coords shot = kernel_->Shot();
     std::cout << shot.x << ' ' << shot.y << '\n';
+}
+
+void Processor::Dump(const std::vector<std::string>& s_cmd) {
+    if (Parser::Dump(kernel_, s_cmd[1])) {
+        std::cout << "ok\n";
+    } else {
+        std::cout << "failed\n";
+    }
+}
+void Processor::Load(const std::vector<std::string>& s_cmd) {
+    if (Parser::Load(kernel_, s_cmd[1])) {
+        std::cout << "ok\n";
+    } else {
+        std::cout << "failed\n";
+    }
 }
 
 void Processor::IsWin() const {

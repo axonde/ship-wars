@@ -67,6 +67,16 @@ size_t Map::GetSize() const {
     return map_.size();
 }
 
+const UnorderedSet& Map::GetMap() const {
+    return map_;
+}
+
+void Map::SetShipForced(const Coords& coords, uint8_t type, bool rotate) {
+    for (uint8_t i = 0; i != type; ++i) {
+        map_.insert(rotate ? Coords{coords.x, coords.y + i} : Coords{coords.x + i, coords.y});
+    }
+}
+
 void Map::draw_(UnorderedMap& drawing, const UnorderedSet& restricted_area, const Coords& coords) const {
     uint64_t right_wall = std::min(dimension_->width_, coords.x + 4);
     uint64_t bottom_wall = std::min(dimension_->height_, coords.y + 4);

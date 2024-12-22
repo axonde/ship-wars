@@ -49,3 +49,7 @@ void Out::ErrorStrategyIsAlreadySet() {
 void Out::ErrorUnknowCmd() {
     std::cout << PURPLE << "[WARNING]" << WHITE << " Unknow command.\n" << RESET;
 }
+
+void Out::PrintMap(const Kernel* kernel) {
+    std::cout << kernel->GetMap();
+}

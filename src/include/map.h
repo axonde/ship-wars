@@ -33,6 +33,9 @@ struct CoordsHash {
     std::size_t operator () (const Coords& coords) const;
 };
 
+using UnorderedMap = boost::unordered_flat_map<Coords, uint8_t, CoordsHash>;
+using UnorderedSet = boost::unordered_set<Coords, CoordsHash>;
+
 class Map {
 /*
     Map: creating and operating shifts / pixels.
@@ -43,6 +46,8 @@ public:
 
     uint8_t HitShip(const Coords& coords);  // 0 - miss, 1 - hit, 2 - kill
     size_t GetSize() const;
+    const UnorderedSet& GetMap() const;
+    void SetShipForced(const Coords& coords, uint8_t type, bool rotate);
 
     friend std::ostream& operator << (std::ostream& out, const Map& map);
 private:
@@ -51,8 +56,6 @@ private:
         bool rotate;  // false - horizontal, true - vertical
     };
 
-    using UnorderedMap = boost::unordered_flat_map<Coords, uint8_t, CoordsHash>;
-    using UnorderedSet = boost::unordered_set<Coords, CoordsHash>;
     UnorderedSet map_;
     uint64_t ships_sum_;
     Dimension* dimension_ = nullptr;

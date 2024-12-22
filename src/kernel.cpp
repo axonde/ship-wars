@@ -28,6 +28,9 @@ void Kernel::SetCustomStrategy() {
 void Kernel::SetShot() {
     strategy_->SetShot();
 }
+void Kernel::SetShipForced(const Coords& coords, uint8_t type, bool rotate) {
+    map_->SetShipForced(coords, type, rotate);
+}
 
 uint64_t Kernel::GetWidth() const {
     return dimension_.width_;
@@ -82,7 +85,6 @@ void Kernel::Start() {
     }
     map_ = new Map(ships_, &dimension_);
     started_ = true;
-    std::cout << *map_;
 }
 void Kernel::Stop() {
     stopped_ = true;

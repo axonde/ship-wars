@@ -4,6 +4,7 @@
 #include <vector>
 #include "map.h"
 #include "kernel.h"
+#include "parser.h"
 #include "utils.h"
 
 class Processor {
@@ -17,6 +18,8 @@ public:
     void Stop();
     void HitShip(const std::vector<std::string>& s_cmd);
     void Shot();
+    void Dump(const std::vector<std::string>& s_cmd);
+    void Load(const std::vector<std::string>& s_cmd);
 
     void IsWin() const;
     void IsLose() const;

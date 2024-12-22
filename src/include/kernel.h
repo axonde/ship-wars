@@ -16,6 +16,7 @@ public:
     void SetOrderedStrategy();
     void SetCustomStrategy();
     void SetShot();
+    void SetShipForced(const Coords& coords, uint8_t type, bool rotate);
 
     uint64_t GetWidth() const;
     uint64_t GetHeight() const;

@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include "kernel.h"
 
 namespace Out {
     inline static char RED[8] = "\e[1;31m";
@@ -29,4 +30,6 @@ namespace Out {
     void ErrorStrategyIsAlreadySet();
 
     void ErrorUnknowCmd();
+
+    void PrintMap(const Kernel* kernel);
 }

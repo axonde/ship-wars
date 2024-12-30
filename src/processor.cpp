@@ -22,6 +22,7 @@ void Processor::Run() {
 
         else if (kernel_ == nullptr) {
             Out::ErrorPlayerIsUnset();
+            continue;
         }
         
         // START & STOP
@@ -50,6 +51,7 @@ void Processor::Run() {
 
         else if (!kernel_->IsStarted()) {
             Out::ErrorKernelIsOff();
+            continue;
         }
         
         // STATUS

@@ -30,8 +30,8 @@ private:
 };
 
 class OrderedStrategy : public Strategy {
-    using Strategy::Strategy;
 public:
+    OrderedStrategy(Dimension *d): Strategy(d) {}
     Coords Shot() override;
     Generated Generate() override;
 private:

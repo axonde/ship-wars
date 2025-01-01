@@ -1,5 +1,9 @@
 #include "include/strategy.h"
 
+Generated::Generated() {
+    ships_.fill(0);
+}
+
 Strategy::Strategy(Dimension* dimension) {
     dimension_ = dimension;
 }

@@ -9,6 +9,7 @@
 struct Generated {
     Dimension dimension_;
     std::array<uint64_t, 5> ships_;
+    Generated();
 };
 
 class Strategy {

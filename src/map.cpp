@@ -29,8 +29,7 @@ std::size_t CoordsHash::operator () (const Coords& coords) const {
 
 Map::Map(Dimension* dimension) : dimension_(dimension) {}
 
-Map::Map(std::array<uint64_t, 5> ships, Dimension* dimension) {
-    dimension_ = dimension;
+Map::Map(std::array<uint64_t, 5> ships, Dimension* dimension) : dimension_(dimension) {
     ships_sum_ = std::accumulate(ships.begin(), ships.end(), 0, std::plus<uint64_t>());
 
     boost::random::mt19937 generator(static_cast<unsigned>(std::time(0)));
@@ -40,11 +39,20 @@ Map::Map(std::array<uint64_t, 5> ships, Dimension* dimension) {
     UnorderedSet restricted_area;  // храним запретные клетки
     UnorderedMap drawing;  // прорисовка
 
+    uint8_t min_type = std::find_if(ships.begin(), ships.end(), [](uint64_t ships_count) {
+        return ships_count > 0;
+    }) - ships.begin();
+
     draw_(drawing, restricted_area, {0, 0});
 
     for (uint8_t type = 4; type != 0; --type) {
         for (uint64_t i = 0; i != ships[type]; ++i) {
-            set_ship_(drawing, restricted_area, type);
+            if (uint64_t available_size = dimension_->width_ * dimension_->height_ - restricted_area.size();
+            type == min_type && available_size >= (ships[type] - i) * type_k_[type]) {
+                set_ship_(drawing, restricted_area, type, &generator);
+            } else {
+                set_ship_(drawing, restricted_area, type);
+            }
         }
     }
 }
@@ -204,7 +212,41 @@ void Map::update_restricted_area_(UnorderedMap& drawing, UnorderedSet& restricte
     }
 }
 
-void Map::set_ship_(UnorderedMap& drawing, UnorderedSet& restricted_area, uint8_t type) {
+void Map::set_ship_(UnorderedMap& drawing, UnorderedSet& restricted_area, uint8_t type, boost::random::mt19937* randomizer) {
+
+    if (randomizer != nullptr) {
+        boost::random::uniform_int_distribution<> distributionX(0, dimension_->width_ - 1);
+        boost::random::uniform_int_distribution<> distributionY(0, dimension_->height_ - 1);
+        Coords coords = {static_cast<uint64_t>(distributionX(*randomizer)), static_cast<uint64_t>(distributionY(*randomizer))};
+
+        std::function<bool(const Coords&)> can_be_horizontal = [&](const Coords& coords) {
+            for (uint i = 0; i != type; ++i) {
+                if (auto iter = restricted_area.find({coords.x + i, coords.y}); iter != restricted_area.end()) return false;
+            }
+            return true;
+        };
+        std::function<bool(const Coords&)> can_be_vertical = [&](const Coords& coords) {
+            for (uint i = 0; i != type; ++i) {
+                if (auto iter = restricted_area.find({coords.x, coords.y + i}); iter != restricted_area.end()) return false;
+            }
+            return true;
+        };
+
+        bool h = can_be_horizontal(coords);
+        bool v = can_be_vertical(coords);
+        if (h || v) {
+            update_restricted_area_(drawing, restricted_area, coords, type, h ? false : true);
+            for (uint8_t i = 0; i != type; ++i) {
+                if (v) {  // vertical
+                    map_.insert({coords.x, coords.y + i});
+                } else {  // horizontal
+                    map_.insert({coords.x + i, coords.y});
+                }
+            }
+            return;
+        }
+    }
+
     std::vector<std::pair<Coords, ShipSetting>> maxs;
 
     choose_pixels_(drawing, maxs, type);

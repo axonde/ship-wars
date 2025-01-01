@@ -10,6 +10,7 @@
 #include <functional>
 #include <iostream>
 #include <iterator>
+#include <map>
 #include <numeric>
 #include <tuple>
 
@@ -59,11 +60,17 @@ private:
     UnorderedSet map_;
     uint64_t ships_sum_;
     Dimension* dimension_ = nullptr;
+    std::map<uint8_t, uint8_t> type_k_ = {  // коэффициенты типов кораблей
+        {1, 9},
+        {2, 6},
+        {3, 5},
+        {4, 5}
+    };
 
     void draw_(UnorderedMap& drawing, const UnorderedSet& restricted_area, const Coords& coords) const;
     void update_drawing_(UnorderedMap& drawing, UnorderedSet& restricted_area, const Coords& coords, uint8_t type, bool rotate) const;
     uint8_t get_rate_(const UnorderedSet& restricted_area, const Coords& coords) const;
     void choose_pixels_(const UnorderedMap& drawing, std::vector<std::pair<Coords, ShipSetting>>& maxs, uint8_t type) const;
     void update_restricted_area_(UnorderedMap& drawing, UnorderedSet& restricted_area, const Coords& coords, uint8_t type, bool rotate) const;
-    void set_ship_(UnorderedMap& drawing, UnorderedSet& restricted_area, uint8_t type);
+    void set_ship_(UnorderedMap& drawing, UnorderedSet& restricted_area, uint8_t type, boost::random::mt19937* randomizer = nullptr);
 };

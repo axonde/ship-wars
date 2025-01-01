@@ -111,9 +111,12 @@ void Processor::Set(const std::vector<std::string>& s_cmd) {
         if (!kernel_->IsStarted() || kernel_->IsStopped()) {
             Out::ErrorResult();
             return;
-        }
-        else if (s_cmd[2] == "hit" || s_cmd[2] == "kill") {
-            kernel_->SetShot();
+        } else if (s_cmd[2] == "kill") {
+            kernel_->KillShot();
+        } else if (s_cmd[2] == "hit") {
+            kernel_->HitShot();
+        } else if (s_cmd[2] == "miss") {
+            kernel_->MissShot();
         }
         if (s_cmd[2] == "miss" || s_cmd[2] == "hit" || s_cmd[2] == "kill") {
             std::cout << "ok\n";

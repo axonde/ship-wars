@@ -237,10 +237,10 @@ void Map::set_ship_(UnorderedMap& drawing, UnorderedSet& restricted_area, uint8_
         if (h || v) {
             update_restricted_area_(drawing, restricted_area, coords, type, h ? false : true);
             for (uint8_t i = 0; i != type; ++i) {
-                if (v) {  // vertical
-                    map_.insert({coords.x, coords.y + i});
-                } else {  // horizontal
+                if (h) {  // vertical
                     map_.insert({coords.x + i, coords.y});
+                } else {  // horizontal
+                    map_.insert({coords.x, coords.y + i});
                 }
             }
             return;

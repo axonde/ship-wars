@@ -25,8 +25,14 @@ void Kernel::SetOrderedStrategy() {
 void Kernel::SetCustomStrategy() {
     strategy_ = new CustomStrategy(&dimension_);
 }
-void Kernel::SetShot() {
-    strategy_->SetShot();
+void Kernel::KillShot() {
+    strategy_->KillShot();
+}
+void Kernel::HitShot() {
+    strategy_->HitShot();
+}
+void Kernel::MissShot() {
+    strategy_->MissShot();
 }
 void Kernel::SetShipForced(const Coords& coords, uint8_t type, bool rotate) {
     map_->SetShipForced(coords, type, rotate);

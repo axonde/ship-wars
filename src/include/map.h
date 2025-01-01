@@ -60,7 +60,7 @@ private:
     UnorderedSet map_;
     uint64_t ships_sum_;
     Dimension* dimension_ = nullptr;
-    std::map<uint8_t, uint8_t> type_k_ = {  // коэффициенты типов кораблей
+    std::map<uint8_t, uint8_t> type_k_ = {  // koefficient for ship's type (ship area + restricted adds)
         {1, 9},
         {2, 6},
         {3, 5},

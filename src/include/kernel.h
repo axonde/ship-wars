@@ -15,7 +15,9 @@ public:
     bool SetCount(uint8_t type, uint64_t count);
     void SetOrderedStrategy();
     void SetCustomStrategy();
-    void SetShot();
+    void KillShot();
+    void HitShot();
+    void MissShot();
     void SetShipForced(const Coords& coords, uint8_t type, bool rotate);
 
     uint64_t GetWidth() const;

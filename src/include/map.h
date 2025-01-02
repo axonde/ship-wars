@@ -25,6 +25,7 @@ struct Coords {
     uint64_t y;
     Coords(uint64_t x_, uint64_t y_) : x(x_), y(y_) {}
     bool operator == (const Coords& coords) const;
+    bool operator < (const Coords& coords) const;
     bool IsTouchingTop() const ;
     bool IsTouchingRight(const Dimension& dimension) const ;
     bool IsTouchingBottom(const Dimension& dimension) const;
@@ -43,9 +44,8 @@ class Map {
     Map: creating and operating shifts / pixels.
 */
 public:
-    Map(Dimension* dimension);
-    Map(std::array<uint64_t, 5> ships, Dimension* dimension);
-
+    // Map(Dimension* dimension);
+    Map(Dimension* dimension, std::array<uint64_t, 5> ships, uint64_t ships_sum);
     uint8_t HitShip(const Coords& coords);  // 0 - miss, 1 - hit, 2 - kill
     size_t GetSize() const;
     const UnorderedSet& GetMap() const;

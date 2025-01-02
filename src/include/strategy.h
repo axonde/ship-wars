@@ -2,11 +2,13 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <iterator>
+#include <functional>
+#include <set>
+#include <vector>
 #include <boost/random.hpp>
 #include <boost/unordered_set.hpp>
 #include <boost/unordered/unordered_flat_map.hpp>
-#include <functional>
-#include <vector>
 #include "map.h"
 
 struct Generated {
@@ -21,9 +23,10 @@ struct Generated {
 class Strategy {
 /*
     Operate all our desision to win the enemy: make shots, set parameters (if we are master).
+    Analyze of the enemy's game.
 */
 public:
-    Strategy(Dimension* dimension);
+    Strategy(Dimension* d, uint64_t s) : dimension_(d), ships_sum_(s) {}
     uint64_t GetWidth() const;
     uint64_t GetHeight() const;
     uint64_t GetShipsSum() const;
@@ -40,7 +43,7 @@ protected:
 
 class OrderedStrategy : public Strategy {
 public:
-    OrderedStrategy(Dimension* d): Strategy(d) {}
+    OrderedStrategy(Dimension* d, uint64_t s): Strategy(d, s) {}
     Coords Shot() override;
     Generated Generate() override;
 private:
@@ -49,8 +52,8 @@ private:
 
 class CustomStrategy : public Strategy {
 public:
-    CustomStrategy(Dimension* d) : Strategy(d) {}
-    Coords Shot() override;  // а будет компилироваться???
+    CustomStrategy(Dimension* d, uint64_t s) : Strategy(d, s) {}
+    Coords Shot() override;
     Generated Generate() override;
     void SetKill() override;
     void SetHit() override;
@@ -60,11 +63,13 @@ private:
     using UnorderedMap = boost::unordered_flat_map<Coords, Coords, CoordsHash>;
     UnorderedSet restricted_area_;
     Coords candidate_ = {0, 0};
-    Coords rush_mark = {0, 0};
+    Coords rush_mark_ = {0, 0};
     UnorderedSet candidates_;
-    UnorderedSet target_;
+    std::set<Coords> target_;
     void rush_();
     void set_candidates_();
+    void update_target_area_();
+    void destroy_ship_();
     void search_();
     void next_();
     void next_square_();
@@ -97,11 +102,10 @@ private:
 
 class ExpStrategy : public Strategy {
 public:
-    ExpStrategy(Dimension* d) : Strategy(d) {}
+    ExpStrategy(Dimension* d, uint64_t s) : Strategy(d, s) {}
     Coords Shot() override;
     Generated Generate() override;
 private:
     using UnorderedSet = boost::unordered_set<Coords, CoordsHash>;
     UnorderedSet restricted_area_;
 };
-

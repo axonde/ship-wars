@@ -4,9 +4,6 @@ Generated::Generated() {
     ships_.fill(0);
 }
 
-Strategy::Strategy(Dimension* dimension) {
-    dimension_ = dimension;
-}
 uint64_t Strategy::GetWidth() const {
     if (dimension_ != nullptr) {
         return dimension_->width_;
@@ -47,7 +44,7 @@ Generated OrderedStrategy::Generate() {
 
 /* CUSTOM */
 /*
-    If all elements are mark out -> UB. (have an undefined while)
+    If the game is won and we try to continue do shots -> UB. (fix in next update)
 */
 Generated CustomStrategy::Generate() {
     boost::random::mt19937 generator(static_cast<unsigned>(std::time(0)));
@@ -63,14 +60,16 @@ Generated CustomStrategy::Generate() {
     return generated;
 }
 Coords CustomStrategy::Shot() {
+    if (restricted_area_.empty()) {  // (0, 0) first return.
+        restricted_area_.insert(candidate_);
+        return candidate_;
+    }
     is_rushing_ ? rush_() : search_();
     return candidate_;
 }
 void CustomStrategy::SetKill() {
-    // is_rushing_ = false;
-    // if (ships_sum_ > 0) {
-    //     --ships_sum_;
-    // }
+    target_.insert(candidate_);
+    destroy_ship_();
 }
 void CustomStrategy::SetHit() {
     is_rushing_ = true;
@@ -78,38 +77,26 @@ void CustomStrategy::SetHit() {
     set_candidates_();
 }
 void CustomStrategy::SetMiss() {
-//     std::cout << "setting miss\n";
-//     if (is_rushing_) {
-//         if (auto pixel = ship_destruction_.find(last_coords_); pixel != ship_destruction_.end()) {
-//             ship_destruction_.erase(pixel);
-//         }
-//     }
-//     if (ship_destruction_.size() == 0) {
-//         is_rushing_ = false;
-//     }
-// }
-// Coords CustomStrategy::rush_shot_() {
-//     last_coords_ = *ship_destruction_.begin();
-//     ship_destruction_.erase(ship_destruction_.begin());
-//     restricted_area_.insert(last_coords_);
-//     return last_coords_;
+    if (is_rushing_ && candidates_.empty()) {
+        destroy_ship_();
+    }
 }
 void CustomStrategy::set_candidates_() {
     std::function<void(bool)> Clear = [&](bool rotated) {
-        for (auto pixel = candidates_.begin(); pixel != candidates_.end(); ++pixel) {
+        for (auto pixel = candidates_.begin(); pixel != candidates_.end();) {
             if (rotated) {
                 if (pixel->x != candidate_.x) {
-                    pixel = candidates_.erase(pixel);
-                }
+                    pixel = candidates_.erase(pixel);  // very interesting moment: the map will return you the next element, not the prev, so be anxious and careful about it
+                } else ++pixel;
             } else {
                 if (pixel->y != candidate_.y) {
                     pixel = candidates_.erase(pixel);
-                }
+                } else ++pixel;
             }
         }
     };
 
-    if (target_.size() == 0) {
+    if (target_.size() == 1) {
         if (!candidate_.IsTouchingLeft()) {
             candidates_.insert({candidate_.x - 1, candidate_.y});
         }
@@ -122,8 +109,10 @@ void CustomStrategy::set_candidates_() {
         if (!candidate_.IsTouchingBottom(*dimension_)) {
             candidates_.insert({candidate_.x, candidate_.y + 1});
         }
+        rush_mark_ = candidate_;
         return;
     }
+
     Coords cxl = {candidate_.x - 1, candidate_.y};  // coord x left
     Coords cxr = {candidate_.x + 1, candidate_.y};  // coord x right
     Coords cyb = {candidate_.x, candidate_.y + 1};  // coord y bottom
@@ -146,11 +135,41 @@ void CustomStrategy::set_candidates_() {
         Clear(1);
     }
 }
+void CustomStrategy::update_target_area_() {
+    uint8_t type = target_.size();
+    bool rotate = target_.begin()->x == target_.rbegin()->x ? true : false;
+    Coords coords = *target_.begin();
+    uint8_t width = 1 + (type - 1) * !rotate;
+    uint8_t height = 1 + (type - 1) * rotate;
+
+    for (int8_t y = -1; y != height + 1; ++y) {
+        for (int8_t x = -1; x != width + 1; ++x) {
+            if ((coords.IsTouchingTop() && y == -1)
+            || (coords.IsTouchingRight(*dimension_) && x == width)
+            || (coords.IsTouchingBottom(*dimension_) && y == height)
+            || (coords.IsTouchingLeft() && x == -1)) {
+                continue;
+            }
+            restricted_area_.insert({coords.x + x, coords.y + y});
+        }
+    }
+}
+void CustomStrategy::destroy_ship_() {
+    if (ships_sum_ > 0) {
+        ships_sum_ -= std::min(ships_sum_, static_cast<uint64_t>(target_.size()));
+    }
+    is_rushing_ = false;
+    update_target_area_();
+    target_.clear();
+    candidate_ = rush_mark_;
+    if (ships_sum_ == 0) return;
+    search_();
+}
 void CustomStrategy::rush_() {
-    std::cout << "debug!! " << candidates_.size() << '\n';
-    candidate_ = *candidates_.begin();
+    auto c = candidates_.begin();
+    candidate_ = *c;
     restricted_area_.insert(candidate_);
-    candidates_.erase(candidates_.begin());
+    candidates_.erase(c);
 }
 void CustomStrategy::search_() {
     do {

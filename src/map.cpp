@@ -7,6 +7,9 @@ bool Dimension::Empty() const {
 bool Coords::operator == (const Coords& coords) const {
     return x == coords.x && y == coords.y;
 }
+bool Coords::operator < (const Coords& coords) const {
+    return std::tie(x, y) < std::tie(coords.x, coords.y);
+}
 bool Coords::IsTouchingTop() const {
     return y == 0;
 }
@@ -27,11 +30,11 @@ std::size_t CoordsHash::operator () (const Coords& coords) const {
     return seed;
 }
 
-Map::Map(Dimension* dimension) : dimension_(dimension) {}
+// Map::Map(Dimension* dimension) : dimension_(dimension) {}
 
-Map::Map(std::array<uint64_t, 5> ships, Dimension* dimension) : dimension_(dimension) {
-    ships_sum_ = std::accumulate(ships.begin(), ships.end(), 0, std::plus<uint64_t>());
-
+Map::Map(Dimension* dimension, std::array<uint64_t, 5> ships, uint64_t ships_sum) {
+    dimension_ = dimension;
+    ships_sum_ = ships_sum;
     boost::random::mt19937 generator(static_cast<unsigned>(std::time(0)));
     boost::random::uniform_int_distribution<> distribution(1, 4);
     int choosen_corner = distribution(generator);

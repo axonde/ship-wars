@@ -20,10 +20,10 @@ bool Kernel::SetCount(uint8_t type, uint64_t count) {
     return true;
 }
 void Kernel::SetOrderedStrategy() {
-    strategy_ = new OrderedStrategy(&dimension_);
+    strategy_ = new OrderedStrategy(&dimension_, ships_sum_);
 }
 void Kernel::SetCustomStrategy() {
-    strategy_ = new CustomStrategy(&dimension_);
+    strategy_ = new CustomStrategy(&dimension_, ships_sum_);
 }
 void Kernel::SetKill() {
     strategy_->SetKill();
@@ -81,15 +81,16 @@ bool Kernel::IsStrategySet() const {
 }
 
 void Kernel::Start() {
+    ships_sum_ = std::accumulate(ships_.begin(), ships_.end(), 0, std::plus<uint64_t>());
     if (strategy_ == nullptr) {
-        strategy_ = new CustomStrategy(&dimension_);
+        strategy_ = new CustomStrategy(&dimension_, ships_sum_);
     }
     if (type_) {  // we are master -> generate the dimension.
         Generated generated = strategy_->Generate();
         dimension_ = generated.dimension_;
         ships_ = generated.ships_;
     }
-    map_ = new Map(ships_, &dimension_);
+    map_ = new Map(&dimension_, ships_, ships_sum_);
     started_ = true;
 }
 void Kernel::Stop() {

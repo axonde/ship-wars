@@ -22,10 +22,10 @@ uint64_t Strategy::GetHeight() const {
 uint64_t Strategy::GetShipsSum() const {
     return ships_sum_;
 }
-void Strategy::HitShot() {
-    KillShot();
+void Strategy::SetKill() {
+    SetHit();
 }
-void Strategy::KillShot() {
+void Strategy::SetHit() {
     if (ships_sum_ > 0) {
         --ships_sum_;
     }
@@ -33,9 +33,6 @@ void Strategy::KillShot() {
 
 /* ORDERED */
 Coords OrderedStrategy::Shot() {
-    /*
-        If all elements are mark out -> UB. (have an undefined while)
-    */
     Coords coords_out = coords_;
     coords_.x = (coords_.x + 1) % GetWidth();
     coords_.y = (coords_.y + 1 * (coords_.x == 0)) % GetHeight();
@@ -49,111 +46,9 @@ Generated OrderedStrategy::Generate() {
 }
 
 /* CUSTOM */
-Coords CustomStrategy::Shot() {
-    if (is_rushing_) {
-        return rush_shot_();
-    }
-    return search_shot_();
-}
-void CustomStrategy::KillShot() {
-    is_rushing_ = false;
-}
-void CustomStrategy::HitShot() {
-    std::function<void(bool)> Clear = [&](bool rotated) {
-        for (auto pixel = ship_destruction_.begin(); pixel != ship_destruction_.end(); ++pixel) {
-            if (rotated) {
-                if (pixel->x != last_coords_.x) {
-                    pixel = ship_destruction_.erase(pixel);
-                }
-            } else {
-                if (pixel->y != last_coords_.y) {
-                    pixel = ship_destruction_.erase(pixel);
-                }
-            }
-        }
-    };
-
-    if (!is_rushing_) {
-        strikes_ = 0;
-        is_rushing_ = true;
-        ship_destruction_.clear();
-        if (!last_coords_.IsTouchingLeft()) {
-            ship_destruction_.insert({last_coords_.x - 1, last_coords_.y});
-        } else if (!last_coords_.IsTouchingTop()) {
-            ship_destruction_.insert({last_coords_.x, last_coords_.y - 1});
-        }
-        if (!last_coords_.IsTouchingRight(*dimension_)) {
-            ship_destruction_.insert({last_coords_.x + 1, last_coords_.y});
-        }
-        if (!last_coords_.IsTouchingBottom(*dimension_)) {
-            ship_destruction_.insert({last_coords_.x, last_coords_.y + 1});
-        }
-    } else {
-        if (strikes_ < 4) {
-            if (ship_destruction_.find({last_coords_.x - 1, last_coords_.y}) != ship_destruction_.end()
-            || ship_destruction_.find({last_coords_.x + 1, last_coords_.y}) != ship_destruction_.end()) {  // horizontal
-                if (restricted_area_.find({last_coords_.x - 1, last_coords_.y}) == restricted_area_.end()) {
-                    ship_destruction_.insert({last_coords_.x - 1, last_coords_.y});
-                }
-                if (restricted_area_.find({last_coords_.x + 1, last_coords_.y}) == restricted_area_.end()) {
-                    ship_destruction_.insert({last_coords_.x + 1, last_coords_.y});
-                }
-                Clear(0);
-            } else {  // vertical
-                if (restricted_area_.find({last_coords_.x, last_coords_.y - 1}) == restricted_area_.end()) {
-                    ship_destruction_.insert({last_coords_.x, last_coords_.y - 1});
-                }
-                if (restricted_area_.find({last_coords_.x, last_coords_.y + 1}) == restricted_area_.end()) {
-                    ship_destruction_.insert({last_coords_.x, last_coords_.y + 1});
-                }
-                Clear(1);
-            }
-            ++strikes_;
-        }
-    }
-    if (ships_sum_ > 0) {
-        --ships_sum_;
-    }
-}
-void CustomStrategy::MissShot() {
-    if (is_rushing_) {
-        ship_destruction_.erase(ship_destruction_.find(last_coords_));
-    }
-    if (ship_destruction_.size() == 0) {
-        is_rushing_ = false;
-    }
-}
-Coords CustomStrategy::rush_shot_() {
-    last_coords_ = *ship_destruction_.begin();
-    ship_destruction_.erase(ship_destruction_.begin());
-    restricted_area_.insert(last_coords_);
-    return last_coords_;
-}
-Coords CustomStrategy::search_shot_() {
-    std::function<void()> Next = [&]() {
-        do {
-            uint8_t x_mod = last_coords_.x % 4;
-            uint8_t y_mod = last_coords_.y % 4;
-            if (x_mod == 3 && y_mod == 3) {
-                if (last_coords_.x + 1 < dimension_->width_) {
-                    ++last_coords_.x;
-                    last_coords_.y -= y_mod;
-                } else {
-                    last_coords_.x = 0;
-                    ++last_coords_.y;
-                }
-                return;
-            }
-            last_coords_ = {(last_coords_.x / 4) * 4 + moves_.find({x_mod, y_mod})->second.x, (last_coords_.y / 4) * 4 + moves_.find({x_mod, y_mod})->second.y};
-        } while (last_coords_.y >= dimension_->height_);
-    };
-
-    while (restricted_area_.find(last_coords_) != restricted_area_.end()) {
-        Next();
-    }
-    restricted_area_.insert(last_coords_);
-    return last_coords_;
-}
+/*
+    If all elements are mark out -> UB. (have an undefined while)
+*/
 Generated CustomStrategy::Generate() {
     boost::random::mt19937 generator(static_cast<unsigned>(std::time(0)));
     boost::random::uniform_int_distribution<> distribution_size(15, 100);
@@ -167,7 +62,137 @@ Generated CustomStrategy::Generate() {
     }
     return generated;
 }
+Coords CustomStrategy::Shot() {
+    is_rushing_ ? rush_() : search_();
+    return candidate_;
+}
+void CustomStrategy::SetKill() {
+    // is_rushing_ = false;
+    // if (ships_sum_ > 0) {
+    //     --ships_sum_;
+    // }
+}
+void CustomStrategy::SetHit() {
+    is_rushing_ = true;
+    target_.insert(candidate_);
+    set_candidates_();
+}
+void CustomStrategy::SetMiss() {
+//     std::cout << "setting miss\n";
+//     if (is_rushing_) {
+//         if (auto pixel = ship_destruction_.find(last_coords_); pixel != ship_destruction_.end()) {
+//             ship_destruction_.erase(pixel);
+//         }
+//     }
+//     if (ship_destruction_.size() == 0) {
+//         is_rushing_ = false;
+//     }
+// }
+// Coords CustomStrategy::rush_shot_() {
+//     last_coords_ = *ship_destruction_.begin();
+//     ship_destruction_.erase(ship_destruction_.begin());
+//     restricted_area_.insert(last_coords_);
+//     return last_coords_;
+}
+void CustomStrategy::set_candidates_() {
+    std::function<void(bool)> Clear = [&](bool rotated) {
+        for (auto pixel = candidates_.begin(); pixel != candidates_.end(); ++pixel) {
+            if (rotated) {
+                if (pixel->x != candidate_.x) {
+                    pixel = candidates_.erase(pixel);
+                }
+            } else {
+                if (pixel->y != candidate_.y) {
+                    pixel = candidates_.erase(pixel);
+                }
+            }
+        }
+    };
 
+    if (target_.size() == 0) {
+        if (!candidate_.IsTouchingLeft()) {
+            candidates_.insert({candidate_.x - 1, candidate_.y});
+        }
+        if (!candidate_.IsTouchingTop()) {
+            candidates_.insert({candidate_.x, candidate_.y - 1});
+        }
+        if (!candidate_.IsTouchingRight(*dimension_)) {
+            candidates_.insert({candidate_.x + 1, candidate_.y});
+        }
+        if (!candidate_.IsTouchingBottom(*dimension_)) {
+            candidates_.insert({candidate_.x, candidate_.y + 1});
+        }
+        return;
+    }
+    Coords cxl = {candidate_.x - 1, candidate_.y};  // coord x left
+    Coords cxr = {candidate_.x + 1, candidate_.y};  // coord x right
+    Coords cyb = {candidate_.x, candidate_.y + 1};  // coord y bottom
+    Coords cyt = {candidate_.x, candidate_.y - 1};  // coord y top
+    if (target_.find(cxl) != target_.end() || target_.find(cxr) != target_.end()) {  // horizontal
+        if (target_.find(cxl) == target_.end() && !candidate_.IsTouchingLeft() && restricted_area_.find(cxl) == restricted_area_.end()) {
+            candidates_.insert(cxl);
+        }
+        if (target_.find(cxr) == target_.end() && !candidate_.IsTouchingRight(*dimension_) && restricted_area_.find(cxr) == restricted_area_.end()) {
+            candidates_.insert(cxr);
+        }
+        Clear(0);
+    } else {  // vertical
+        if (target_.find(cyb) == target_.end() && !candidate_.IsTouchingBottom(*dimension_) && restricted_area_.find(cyb) == restricted_area_.end()) {
+            candidates_.insert(cyb);
+        }
+        if (target_.find(cyt) == target_.end() && !candidate_.IsTouchingTop() && restricted_area_.find(cyt) == restricted_area_.end()) {
+            candidates_.insert(cyt);
+        }
+        Clear(1);
+    }
+}
+void CustomStrategy::rush_() {
+    std::cout << "debug!! " << candidates_.size() << '\n';
+    candidate_ = *candidates_.begin();
+    restricted_area_.insert(candidate_);
+    candidates_.erase(candidates_.begin());
+}
+void CustomStrategy::search_() {
+    do {
+        next_();
+    } while (candidate_.x >= dimension_->width_ || candidate_.y >= dimension_->height_ || restricted_area_.find(candidate_) != restricted_area_.end());
+}
+void CustomStrategy::next_() {
+    const uint64_t x = candidate_.x / 4 * 4;
+    const uint64_t y = candidate_.y / 4 * 4;
+    uint8_t x_mod = candidate_.x % 4;
+    uint8_t y_mod = candidate_.y % 4;
+    Coords move = moves_.find({x_mod, y_mod})->second;
+
+    auto next = std::find(firing_[level_].begin(), firing_[level_].end(), move);
+    restricted_area_.insert(candidate_);
+    if (next != firing_[level_].end()) {
+        candidate_ = {x + move.x, y + move.y};
+        return;
+    }
+    next_square_();
+    candidate_ = {candidate_.x + firing_[level_ % 4][0].x, candidate_.y + firing_[level_ % 4][0].y};
+}
+void CustomStrategy::next_square_() {
+    uint64_t& x = candidate_.x;
+    uint64_t& y = candidate_.y;
+    const uint8_t x_mod = x % 4;
+    const uint8_t y_mod = y % 4;
+    if (x / 4 * 4 + 4 > dimension_->width_) {
+        x = 0;
+        if (y / 4 * 4 + 4 > dimension_->height_) {
+            ++level_;
+            y = 0;
+        } else {
+            y = y / 4 * 4 + 4;
+        }
+    } else {
+        x = x / 4 * 4 + 4;
+        y = y / 4 * 4;
+    }
+}
+
+/* old custom strategy -> now obsolete */
 Coords ExpStrategy::Shot() {
     /*
         very bad choice if you have big dimension and a small quantity of avaible pixel...

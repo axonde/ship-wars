@@ -112,11 +112,11 @@ void Processor::Set(const std::vector<std::string>& s_cmd) {
             Out::ErrorResult();
             return;
         } else if (s_cmd[2] == "kill") {
-            kernel_->KillShot();
+            kernel_->SetKill();
         } else if (s_cmd[2] == "hit") {
-            kernel_->HitShot();
+            kernel_->SetHit();
         } else if (s_cmd[2] == "miss") {
-            kernel_->MissShot();
+            kernel_->SetMiss();
         }
         if (s_cmd[2] == "miss" || s_cmd[2] == "hit" || s_cmd[2] == "kill") {
             std::cout << "ok\n";
@@ -138,9 +138,7 @@ void Processor::Set(const std::vector<std::string>& s_cmd) {
         } else if (s_cmd[2] == "custom") {
             kernel_->SetCustomStrategy();
             std::cout << "ok\n";
-        } else {
-            Out::ErrorStrategy();
-        }
+        } else { Out::ErrorStrategy(); }
     }
 
     else if ((s_cmd[1] == "width" || s_cmd[1] == "height" || s_cmd[1] == "count") && !kernel_->GetType()) {
@@ -156,9 +154,7 @@ void Processor::Set(const std::vector<std::string>& s_cmd) {
         } else { std::cout << "failed\n"; }
     }
     
-    else {
-        Out::ErrorSet();
-    }
+    else { Out::ErrorSet(); }
 }
 
 void Processor::Get(const std::vector<std::string>& s_cmd) const {

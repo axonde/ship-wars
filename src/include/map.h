@@ -23,6 +23,7 @@ struct Dimension {
 struct Coords {
     uint64_t x;
     uint64_t y;
+    Coords(uint64_t x_, uint64_t y_) : x(x_), y(y_) {}
     bool operator == (const Coords& coords) const;
     bool IsTouchingTop() const ;
     bool IsTouchingRight(const Dimension& dimension) const ;

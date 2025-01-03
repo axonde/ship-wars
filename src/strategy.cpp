@@ -19,6 +19,9 @@ uint64_t Strategy::GetHeight() const {
 uint64_t Strategy::GetShipsSum() const {
     return ships_sum_;
 }
+void Strategy::UpdateShipsSum(uint64_t ships_sum) {
+    ships_sum_ = ships_sum;
+}
 void Strategy::SetKill() {
     SetHit();
 }
@@ -158,9 +161,7 @@ void CustomStrategy::update_target_area_() {
 }
 void CustomStrategy::destroy_ship_() {
     if (ships_sum_ > 0) {
-        std::cout << "before ships_sum_ => " << ships_sum_ << '\n';
         ships_sum_ -= std::min(ships_sum_, static_cast<uint64_t>(target_.size()));
-        std::cout << "after ships_sum_ -> " << ships_sum_ << '\n';
     }
     is_rushing_ = false;
     update_target_area_();

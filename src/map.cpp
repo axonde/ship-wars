@@ -30,8 +30,6 @@ std::size_t CoordsHash::operator () (const Coords& coords) const {
     return seed;
 }
 
-// Map::Map(Dimension* dimension) : dimension_(dimension) {}
-
 Map::Map(Dimension* dimension, std::array<uint64_t, 5> ships, uint64_t ships_sum) {
     dimension_ = dimension;
     ships_sum_ = ships_sum;

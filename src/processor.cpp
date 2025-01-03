@@ -61,6 +61,8 @@ void Processor::Run() {
             IsWin();
         } else if (s_cmd[0] == "lose") {
             IsLose();
+        } else if (s_cmd[0] == "print") {
+            Out::PrintMap(kernel_);
         }
 
         else if (kernel_->IsStopped()) {
@@ -73,10 +75,6 @@ void Processor::Run() {
             HitShip(s_cmd);
         } else if (s_cmd[0] == "shot") {
             Shot();
-        }
-
-        else if (s_cmd[0] == "print") {
-            Out::PrintMap(kernel_);
         }
         
         else {
@@ -196,6 +194,14 @@ void Processor::Stop() {
 }
 
 void Processor::HitShip(const std::vector<std::string>& s_cmd) {
+    if (kernel_->IsWin()) {
+        Out::AbortAlreadyWin();
+        return;
+    }
+    if (kernel_->IsLose()) {
+        Out::AbortAlreadyLose();
+        return;
+    }
     if (uint8_t shot = kernel_->HitShip({
         static_cast<uint64_t>(std::stoll(s_cmd[1])), 
         static_cast<uint64_t>(std::stoll(s_cmd[2]))
@@ -207,6 +213,14 @@ void Processor::HitShip(const std::vector<std::string>& s_cmd) {
 }
 
 void Processor::Shot() {
+    if (kernel_->IsWin()) {
+        Out::AbortAlreadyWin();
+        return;
+    }
+    if (kernel_->IsLose()) {
+        Out::AbortAlreadyLose();
+        return;
+    }
     Coords shot = kernel_->Shot();
     std::cout << shot.x << ' ' << shot.y << '\n';
 }
@@ -219,9 +233,13 @@ void Processor::Dump(const std::vector<std::string>& s_cmd) {
     }
 }
 void Processor::Load(const std::vector<std::string>& s_cmd) {
-    if (Parser::Load(kernel_, s_cmd[1])) {
+    if (!kernel_->GetType() && Parser::Load(kernel_, s_cmd[1])) {
         std::cout << "ok\n";
+        Out::WarningLoad();
     } else {
+        if (kernel_->GetType()) {
+            Out::ErrorLoadMasterPlayer();
+        }
         std::cout << "failed\n";
     }
 }

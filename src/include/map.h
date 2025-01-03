@@ -44,7 +44,6 @@ class Map {
     Map: creating and operating shifts / pixels.
 */
 public:
-    // Map(Dimension* dimension);
     Map(Dimension* dimension, std::array<uint64_t, 5> ships, uint64_t ships_sum);
     uint8_t HitShip(const Coords& coords);  // 0 - miss, 1 - hit, 2 - kill
     size_t GetSize() const;

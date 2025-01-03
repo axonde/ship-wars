@@ -30,6 +30,7 @@ public:
     uint64_t GetWidth() const;
     uint64_t GetHeight() const;
     uint64_t GetShipsSum() const;
+    void UpdateShipsSum(uint64_t ships_sum);
     virtual Coords Shot() = 0;
     virtual Generated Generate() = 0;
     virtual void SetKill();

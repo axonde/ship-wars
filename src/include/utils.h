@@ -6,7 +6,7 @@ namespace Out {
     inline static char RED[8] = "\e[1;31m";
     inline static char YELLOW[8] = "\e[1;33m";
     inline static char PURPLE[8] = "\e[1;35m";
-    inline static char WHITE[6] = "\e[97m";
+    inline static char WHITE[8] = "\e[1;97m";
     inline static char RESET[5] = "\e[0m";
 
     void Welcome();
@@ -28,6 +28,12 @@ namespace Out {
 
     void ErrorStrategy();
     void ErrorStrategyIsAlreadySet();
+
+    void WarningLoad();
+    void ErrorLoadMasterPlayer();
+
+    void AbortAlreadyWin();
+    void AbortAlreadyLose();
 
     void ErrorUnknowCmd();
 

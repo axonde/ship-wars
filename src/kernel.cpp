@@ -57,7 +57,6 @@ const bool Kernel::GetType() const {
     return type_;
 }
 
-
 bool Kernel::IsReady() const {
     if (!type_ && (dimension_.Empty() || std::all_of(ships_.begin(), ships_.end(), [](const auto& x) {return x == 0;}))) {
         return false;
@@ -81,9 +80,6 @@ bool Kernel::IsStrategySet() const {
 }
 
 void Kernel::Start() {
-    for (uint8_t t = 1; t != 5; ++t) {
-        ships_sum_ += t * ships_[t];
-    }
     if (strategy_ == nullptr) {
         strategy_ = new CustomStrategy(&dimension_, ships_sum_);
     }
@@ -92,12 +88,17 @@ void Kernel::Start() {
         dimension_ = generated.dimension_;
         ships_ = generated.ships_;
     }
+    for (uint8_t t = 1; t != 5; ++t) {
+        ships_sum_ += t * ships_[t];
+    }
+    strategy_->UpdateShipsSum(ships_sum_);
     map_ = new Map(&dimension_, ships_, ships_sum_);
     started_ = true;
 }
 void Kernel::Stop() {
     stopped_ = true;
 }
+
 uint8_t Kernel::HitShip(const Coords& coords) {
     return map_->HitShip(coords);
 }

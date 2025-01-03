@@ -33,7 +33,7 @@ void Out::ErrorPlayerIsSet() {
     std::cout << RED << "[ERROR]" << WHITE << " The player is already set.\n" << RESET;
 }
 void Out::ErrorPlayerIsUnset() {
-    std::cout << PURPLE << "[WARNING]" << WHITE << " Ho-ho. You can't start to set the game without provide me the type of the player 😝\n" << RESET;
+    std::cout << PURPLE << "[WARNING]" << WHITE << " Ho-ho. You can't do anything without provide me the type of the player 😝\n" << RESET;
 }
 void Out::ErrorPlayerIncorrect() {
     std::cout << PURPLE << "[WARNING]" << WHITE << " You are only able to set master or slave player's type.\n" << RESET;
@@ -44,6 +44,20 @@ void Out::ErrorStrategy() {
 }
 void Out::ErrorStrategyIsAlreadySet() {
     std::cout << RED << "[ERROR]" << WHITE << " You already set the strategy. If you want to change it, restart the program :(\n" << RESET;
+}
+
+void Out::WarningLoad() {
+    std::cout << PURPLE << "[WARNING]" << RESET << " Please notice, that after the load command the game is " << WHITE << "already started!" << RESET << "\n";
+}
+void Out::ErrorLoadMasterPlayer() {
+    std::cout << RED << "[ERROR]" << RESET << " You can't load file while you are a master player.\n";
+}
+
+void Out::AbortAlreadyWin() {
+    std::cout << YELLOW << "[ABORT]" << RESET << " I already win! 🏆🤫🧏\n";
+}
+void Out::AbortAlreadyLose() {
+    std::cout << YELLOW << "[ABORT]" << RESET << " You already win.. 😡🤡\n";
 }
 
 void Out::ErrorUnknowCmd() {

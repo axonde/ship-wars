@@ -28,6 +28,7 @@ void Strategy::SetHit() {
     }
 }
 
+
 /* ORDERED */
 Coords OrderedStrategy::Shot() {
     Coords coords_out = coords_;
@@ -41,6 +42,7 @@ Generated OrderedStrategy::Generate() {
     generated.ships_ = {0, 0, 0, 0, 51 * 30};
     return generated;
 }
+
 
 /* CUSTOM */
 /*
@@ -96,27 +98,27 @@ void CustomStrategy::set_candidates_() {
         }
     };
 
-    if (target_.size() == 1) {
-        if (!candidate_.IsTouchingLeft()) {
-            candidates_.insert({candidate_.x - 1, candidate_.y});
-        }
-        if (!candidate_.IsTouchingTop()) {
-            candidates_.insert({candidate_.x, candidate_.y - 1});
-        }
-        if (!candidate_.IsTouchingRight(*dimension_)) {
-            candidates_.insert({candidate_.x + 1, candidate_.y});
-        }
-        if (!candidate_.IsTouchingBottom(*dimension_)) {
-            candidates_.insert({candidate_.x, candidate_.y + 1});
-        }
-        rush_mark_ = candidate_;
-        return;
-    }
-
     Coords cxl = {candidate_.x - 1, candidate_.y};  // coord x left
     Coords cxr = {candidate_.x + 1, candidate_.y};  // coord x right
     Coords cyb = {candidate_.x, candidate_.y + 1};  // coord y bottom
     Coords cyt = {candidate_.x, candidate_.y - 1};  // coord y top
+
+    if (target_.size() == 1 && candidates_.empty()) {
+        if (!candidate_.IsTouchingLeft() && restricted_area_.find(cxl) == restricted_area_.end()) {
+            candidates_.insert(cxl);
+        }
+        if (!candidate_.IsTouchingTop() && restricted_area_.find(cyt) == restricted_area_.end()) {
+            candidates_.insert(cyt);
+        }
+        if (!candidate_.IsTouchingRight(*dimension_) && restricted_area_.find(cxr) == restricted_area_.end()) {
+            candidates_.insert(cxr);
+        }
+        if (!candidate_.IsTouchingBottom(*dimension_) && restricted_area_.find(cyb) == restricted_area_.end()) {
+            candidates_.insert(cyb);
+        }
+        return;
+    }
+
     if (target_.find(cxl) != target_.end() || target_.find(cxr) != target_.end()) {  // horizontal
         if (target_.find(cxl) == target_.end() && !candidate_.IsTouchingLeft() && restricted_area_.find(cxl) == restricted_area_.end()) {
             candidates_.insert(cxl);
@@ -156,14 +158,15 @@ void CustomStrategy::update_target_area_() {
 }
 void CustomStrategy::destroy_ship_() {
     if (ships_sum_ > 0) {
+        std::cout << "before ships_sum_ => " << ships_sum_ << '\n';
         ships_sum_ -= std::min(ships_sum_, static_cast<uint64_t>(target_.size()));
+        std::cout << "after ships_sum_ -> " << ships_sum_ << '\n';
     }
     is_rushing_ = false;
     update_target_area_();
     target_.clear();
     candidate_ = rush_mark_;
     if (ships_sum_ == 0) return;
-    search_();
 }
 void CustomStrategy::rush_() {
     auto c = candidates_.begin();
@@ -174,6 +177,7 @@ void CustomStrategy::rush_() {
 void CustomStrategy::search_() {
     do {
         next_();
+        rush_mark_ = candidate_;
     } while (candidate_.x >= dimension_->width_ || candidate_.y >= dimension_->height_ || restricted_area_.find(candidate_) != restricted_area_.end());
 }
 void CustomStrategy::next_() {
@@ -210,6 +214,7 @@ void CustomStrategy::next_square_() {
         y = y / 4 * 4;
     }
 }
+
 
 /* old custom strategy -> now obsolete */
 Coords ExpStrategy::Shot() {

@@ -81,7 +81,9 @@ bool Kernel::IsStrategySet() const {
 }
 
 void Kernel::Start() {
-    ships_sum_ = std::accumulate(ships_.begin(), ships_.end(), 0, std::plus<uint64_t>());
+    for (uint8_t t = 1; t != 5; ++t) {
+        ships_sum_ += t * ships_[t];
+    }
     if (strategy_ == nullptr) {
         strategy_ = new CustomStrategy(&dimension_, ships_sum_);
     }

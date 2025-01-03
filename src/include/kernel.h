@@ -43,7 +43,7 @@ private:
     bool started_ = false;
     bool stopped_ = false;
     bool type_;  // тип игрока: 0 - slave; 1 - master
-    uint64_t ships_sum_;
+    uint64_t ships_sum_ = 0;
     Dimension dimension_;  // размерность поля
     Strategy* strategy_ = nullptr;  // выбранная стратегия
     Map* map_ = nullptr;  // наша карта

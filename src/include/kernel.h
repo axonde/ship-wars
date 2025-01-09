@@ -40,8 +40,8 @@ public:
 
     ~Kernel();
 private:
-    bool started_ = false;
-    bool stopped_ = false;
+    bool started_ = false;  // начата ли текущая игра
+    bool stopped_ = false;  // завершена ли текущая игра (проигрыш или выигрыш)
     bool type_;  // тип игрока: 0 - slave; 1 - master
     uint64_t ships_sum_ = 0;
     Dimension dimension_;  // размерность поля

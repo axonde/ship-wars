@@ -9,15 +9,13 @@ project(
 
 set(CMAKE_CXX_STANDARD 20)
 
-# Поиск Boost в системе
-find_package(Boost REQUIRED)
+set(LOCAL_BOOST_PATH "${CMAKE_SOURCE_DIR}/src/boost")
+include_directories(SYSTEM ${LOCAL_BOOST_PATH})
+message(STATUS "Using local Boost library: ${LOCAL_BOOST_PATH}")
 
-if(Boost_FOUND)
-    message(STATUS "Boost found: ${Boost_INCLUDE_DIRS}")
-    include_directories(${Boost_INCLUDE_DIRS})
-else()
-    message(FATAL_ERROR "Boost not found!")
-endif()
+message(STATUS "CMAKE_INCLUDE_PATH: ${CMAKE_INCLUDE_PATH}")
+message(STATUS "CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE: ${CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE}")
+
 
 add_compile_options(-fsanitize=address)
 add_link_options(-fsanitize=address)

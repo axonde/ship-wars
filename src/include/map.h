@@ -1,10 +1,6 @@
 #pragma once
 #include <array>
 #include <algorithm>
-#include <boost/unordered/unordered_flat_map.hpp>
-#include <boost/unordered_set.hpp>
-#include <boost/functional/hash.hpp>
-#include <boost/random.hpp>
 #include <cstdint>
 #include <ctime>
 #include <functional>
@@ -13,6 +9,10 @@
 #include <map>
 #include <numeric>
 #include <tuple>
+#include <boost/unordered/unordered_flat_map.hpp>
+#include <boost/unordered_set.hpp>
+#include <boost/functional/hash.hpp>
+#include <boost/random.hpp>
 
 struct Dimension {
     uint64_t width_;

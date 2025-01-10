@@ -207,3 +207,44 @@ flowchart LR
 		%% others
 		ping([ping])
 ```
+
+
+# UB (Undefined Behavior)
+При разработке было не покрыто следующее неопределённое поведение: при отстреле всех существующих ячеек и неправильном информировании программы о попадании возможна ситуация, когда программа отстреляет все ячейке, не выиграв. Это вызовет UB, а точнее - Segmetention fault.
+Пример:
+```
+🏴‍☠️ Welcome to Ship Wars!
+create slave
+ok
+set width 8
+ok
+set height 4
+ok
+set count 1 1
+ok
+start
+ok
+shot  
+0 0
+shot
+1 1
+...
+shot
+7 3
+shot
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==22722==ERROR: AddressSanitizer: SEGV on unknown address 0x00000000003f (pc 0x000105d71fe1 bp 0x7ff7ba1b82b0 sp 0x7ff7ba1b8260 T0)
+==22722==The signal is caused by a READ memory access.
+==22722==Hint: address points to the zero page.
+    #0 0x105d71fe1 in Coords::operator==(Coords const&) const+0x41 (ship-wars:x86_64+0x10002bfe1)
+    #1 0x105de11a3 in std::__1::__wrap_iter<Coords const*> std::__1::find[abi:v160006]<std::__1::__wrap_iter<Coords const*>, Coords>(std::__1::__wrap_iter<Coords const*>, std::__1::__wrap_iter<Coords const*>, Coords const&)+0x193 (ship-wars:x86_64+0x10009b1a3)
+    #2 0x105de0a21 in CustomStrategy::next_()+0xd71 (ship-wars:x86_64+0x10009aa21)
+    #3 0x105ddaf13 in CustomStrategy::search_()+0x123 (ship-wars:x86_64+0x100094f13)
+    #4 0x105dda947 in CustomStrategy::Shot()+0x1b7 (ship-wars:x86_64+0x100094947)
+    #5 0x105d4bff4 in Kernel::Shot()+0x164 (ship-wars:x86_64+0x100005ff4)
+    #6 0x105d651e5 in Processor::Shot()+0x2f5 (ship-wars:x86_64+0x10001f1e5)
+    #7 0x105d61fbb in Processor::Run(bool)+0xc8b (ship-wars:x86_64+0x10001bfbb)
+    #8 0x105d4a057 in main+0x157 (ship-wars:x86_64+0x100004057)
+    #9 0x7ff80a1a2417 in start+0x767 (dyld:x86_64+0xfffffffffff6e417)
+```

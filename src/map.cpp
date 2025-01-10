@@ -33,9 +33,8 @@ std::size_t CoordsHash::operator () (const Coords& coords) const {
 Map::Map(Dimension* dimension, std::array<uint64_t, 5> ships, uint64_t ships_sum) {
     dimension_ = dimension;
     ships_sum_ = ships_sum;
+
     boost::random::mt19937 generator(static_cast<unsigned>(std::time(0)));
-    boost::random::uniform_int_distribution<> distribution(1, 4);
-    int choosen_corner = distribution(generator);
 
     UnorderedSet restricted_area;  // храним запретные клетки
     UnorderedMap drawing;  // прорисовка
@@ -55,6 +54,20 @@ Map::Map(Dimension* dimension, std::array<uint64_t, 5> ships, uint64_t ships_sum
                 set_ship_(drawing, restricted_area, type);
             }
         }
+    }
+
+    boost::random::uniform_int_distribution<> distribution(0, 3);
+    int choosen_corner = distribution(generator);
+
+    switch (choosen_corner) {
+        case 0:
+            map_ = flip_horizontal_();
+            break;
+        case 1:
+            map_ = flip_vertical_();
+            break;
+        case 2:
+            map_ = flip_diagonal_();
     }
 }
 
@@ -273,6 +286,28 @@ void Map::set_ship_(UnorderedMap& drawing, UnorderedSet& restricted_area, uint8_
     update_restricted_area_(drawing, restricted_area, coords, type, choosen.second.rotate);
 
     update_drawing_(drawing, restricted_area, coords, type, choosen.second.rotate);
+}
+
+UnorderedSet Map::flip_horizontal_() {
+    UnorderedSet flipped;
+    for (const Coords& coords : map_) {
+        flipped.insert({dimension_->width_ - coords.x - 1, coords.y});
+    }
+    return flipped;
+}
+UnorderedSet Map::flip_vertical_() {
+    UnorderedSet flipped;
+    for (const Coords& coords : map_) {
+        flipped.insert({coords.x, dimension_->height_ - coords.y - 1});
+    }
+    return flipped;
+}
+UnorderedSet Map::flip_diagonal_() {
+    UnorderedSet flipped;
+    for (const Coords& coords : map_) {
+        flipped.insert({dimension_->width_ - coords.x - 1, dimension_->height_ - coords.y - 1});
+    }
+    return flipped;
 }
 
 std::ostream& operator << (std::ostream& out, const Map& map) {

@@ -80,12 +80,6 @@ void CustomStrategy::SetHit() {
     is_rushing_ = true;
     target_.insert(candidate_);
     set_candidates_();
-    std::cout << "printing candidates:\n";
-    for (auto cand : candidates_) {
-        std::cout << '(' << cand.x << ";" << cand.y << ')' << " - ";
-    }
-    std::cout << '\n';
-
 }
 void CustomStrategy::SetMiss() {
     if (is_rushing_ && candidates_.empty()) {
@@ -107,14 +101,12 @@ void CustomStrategy::set_candidates_() {
         }
     };
 
-    std::cout << "running set candidates..\n";
     Coords cxl = {candidate_.x - 1, candidate_.y};  // coord x left
     Coords cxr = {candidate_.x + 1, candidate_.y};  // coord x right
     Coords cyb = {candidate_.x, candidate_.y + 1};  // coord y bottom
     Coords cyt = {candidate_.x, candidate_.y - 1};  // coord y top
 
     if (target_.size() == 1 && candidates_.empty()) {
-        std::cout << "reseting..\n";
         if (!candidate_.IsTouchingLeft() && restricted_area_.find(cxl) == restricted_area_.end()) {
             candidates_.insert(cxl);
         }
@@ -130,7 +122,6 @@ void CustomStrategy::set_candidates_() {
         return;
     }
 
-    std::cout << "update candidates..\n";
     if (target_.find(cxl) != target_.end() || target_.find(cxr) != target_.end()) {  // horizontal
         if (target_.find(cxl) == target_.end() && !candidate_.IsTouchingLeft() && restricted_area_.find(cxl) == restricted_area_.end()) {
             candidates_.insert(cxl);

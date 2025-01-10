@@ -73,4 +73,8 @@ private:
     void choose_pixels_(const UnorderedMap& drawing, std::vector<std::pair<Coords, ShipSetting>>& maxs, uint8_t type) const;
     void update_restricted_area_(UnorderedMap& drawing, UnorderedSet& restricted_area, const Coords& coords, uint8_t type, bool rotate) const;
     void set_ship_(UnorderedMap& drawing, UnorderedSet& restricted_area, uint8_t type, boost::random::mt19937* randomizer = nullptr);
+
+    UnorderedSet flip_horizontal_();
+    UnorderedSet flip_vertical_();
+    UnorderedSet flip_diagonal_();
 };

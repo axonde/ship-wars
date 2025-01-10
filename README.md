@@ -82,3 +82,128 @@ lose - должно вернуть да, если мы однозначно пр
 ## Стратегии (Strategy)
 
 Реализованы две стратегии: ordered, custom. Названия сами за себя говорят, так что добавить мне здесь нечего. Пока я не знаю, как именно я их реализую, но они будут как раз отвечать за ходы: какую клетку стоит бить дальше.
+
+
+## Дерево команд
+```mermaid
+flowchart LR
+		%% creating
+    create
+		master
+		slave
+		create --> master
+		create --> slave
+		
+		%% slave setting
+		set
+		slave --> set
+		width
+		height
+		strategy(strategy)
+		set --> width
+		set --> height
+		set --> strategy
+
+		%% set strategy
+		ordered
+		custom
+		others@{ shape: braces, label: "others..." }
+		strategy --> ordered
+		strategy --> custom
+		strategy --> others
+
+		%% set count
+		count["count (setting the n deck)"]
+		count1
+		count2
+		count3
+		count4
+		count --> count1["set count 1"]
+		count --> count2["set count 2"]
+		count --> count3["set count 3"]
+		count --> count4["set count 4"]
+		set --> count
+
+		%% load
+		load{{load}}
+		slave --> load
+
+
+		%% master getters
+		get
+		master --> get
+		widthM[width]
+		heightM[height]
+		get --> widthM
+		get --> heightM
+
+		%% get count
+		countM["count (get the n deck)"]
+		count1M
+		count2M
+		count3M
+		count4M
+		countM --> count1M["get count 1"]
+		countM --> count2M["get count 2"]
+		countM --> count3M["get count 3"]
+		countM --> count4M["get count 4"]
+		get --> countM
+
+
+		%% verify / waiting
+		verifyS["verifying that all values are set"]
+		width --> verifyS
+		height --> verifyS
+		count1 --> verifyS
+		count2 --> verifyS
+		count3 --> verifyS
+		count4 --> verifyS
+
+		verifyM["just waiting for the start cmd"]
+		widthM --> verifyM
+		heightM --> verifyM
+		count1M --> verifyM
+		count2M --> verifyM
+		count3M --> verifyM
+		count4M --> verifyM
+
+
+		%% start
+		start((start))
+		verifyS --> start
+		verifyM --> start
+		load --> start
+
+		%% dump
+		dump
+		start --> dump
+
+		%% shots
+		shot
+		shotCoord[shot X Y]
+		result[set result]
+		start --> shot
+		start --> shotCoord
+		shotCoord --> result
+
+		%% win / lose
+		game[players are playing]
+		stop
+		finished
+		win
+		lose
+		shot --> game
+		result --> game
+		game --> stop
+		stop --> finished
+		game --> finished
+		finished --> win
+		finished --> lose
+		exit(((exit)))
+		win --> exit
+		lose --> exit
+
+
+		%% others
+		ping([ping])
+```

@@ -1,7 +1,9 @@
 #include "include/processor.h"
 
-void Processor::Run() {
-    Out::Welcome();
+void Processor::Run(bool is_verbose) {
+    out_ = is_verbose ? new Verbose : new Out;
+
+    out_->Welcome();
 
     std::string cmd;
     std::vector<std::string> s_cmd;
@@ -21,7 +23,7 @@ void Processor::Run() {
         }
 
         else if (kernel_ == nullptr) {
-            Out::ErrorPlayerIsUnset();
+            out_->ErrorPlayerIsUnset();
             continue;
         }
         
@@ -50,7 +52,7 @@ void Processor::Run() {
         }
 
         else if (!kernel_->IsStarted()) {
-            Out::ErrorKernelIsOff();
+            out_->ErrorKernelIsOff();
             continue;
         }
         
@@ -62,11 +64,11 @@ void Processor::Run() {
         } else if (s_cmd[0] == "lose") {
             IsLose();
         } else if (s_cmd[0] == "print") {
-            Out::PrintMap(kernel_);
+            out_->PrintMap(kernel_);
         }
 
         else if (kernel_->IsStopped()) {
-            Out::WarningKernelIsAlreadyStopped();
+            out_->WarningKernelIsAlreadyStopped();
             continue;
         }
 
@@ -78,7 +80,7 @@ void Processor::Run() {
         }
         
         else {
-            Out::ErrorUnknowCmd();
+            out_->ErrorUnknowCmd();
         }
     }
 }
@@ -87,27 +89,28 @@ void Processor::Test() const {
     std::cout << "pong\n";
 }
 
-bool Processor::Create(const std::vector<std::string>& s_cmd) {
+void Processor::Create(const std::vector<std::string>& s_cmd) {
     if (kernel_ != nullptr) {
-        Out::ErrorPlayerIsSet();
-        return false;
+        out_->ErrorPlayerIsSet();
+        std::cout << "failed\n";
+        return;
     }
     if (s_cmd[1] == "master") {
         kernel_ = new Kernel(1);
     } else if (s_cmd[1] == "slave") {
         kernel_ = new Kernel(0);
     } else {
-        Out::ErrorPlayerIncorrect();
-        return false;
+        out_->ErrorPlayerIncorrect();
+        std::cout << "failed\n";
+        return;
     }
     std::cout << "ok\n";
-    return true;
 }
 
 void Processor::Set(const std::vector<std::string>& s_cmd) {
     if (s_cmd[1] == "result") {
         if (!kernel_->IsStarted() || kernel_->IsStopped()) {
-            Out::ErrorResult();
+            out_->ErrorResult();
             return;
         } else if (s_cmd[2] == "kill") {
             kernel_->SetKill();
@@ -119,24 +122,24 @@ void Processor::Set(const std::vector<std::string>& s_cmd) {
         if (s_cmd[2] == "miss" || s_cmd[2] == "hit" || s_cmd[2] == "kill") {
             std::cout << "ok\n";
         } else {
-            Out::ErrorResultCmd();
+            out_->ErrorResultCmd();
         }
     }
 
     else if (kernel_->IsStarted() || kernel_->IsStopped()) {
-        Out::ErrorSet();
+        out_->ErrorSet();
     }
 
     else if (s_cmd[1] == "strategy") {
         if (kernel_->IsStrategySet()) {
-            Out::ErrorStrategyIsAlreadySet();
+            out_->ErrorStrategyIsAlreadySet();
         } else if (s_cmd[2] == "ordered") {
             kernel_->SetOrderedStrategy();
             std::cout << "ok\n";
         } else if (s_cmd[2] == "custom") {
             kernel_->SetCustomStrategy();
             std::cout << "ok\n";
-        } else { Out::ErrorStrategy(); }
+        } else { out_->ErrorStrategy(); }
     }
 
     else if ((s_cmd[1] == "width" || s_cmd[1] == "height" || s_cmd[1] == "count") && !kernel_->GetType()) {
@@ -152,12 +155,12 @@ void Processor::Set(const std::vector<std::string>& s_cmd) {
         } else { std::cout << "failed\n"; }
     }
     
-    else { Out::ErrorSet(); }
+    else { out_->ErrorSet(); }
 }
 
 void Processor::Get(const std::vector<std::string>& s_cmd) const {
     if (!kernel_->IsStarted()) {
-        Out::ErrorEarlierMasterGetting();
+        out_->ErrorEarlierMasterGetting();
         return;
     }
     if (s_cmd[1] == "width") {
@@ -167,7 +170,7 @@ void Processor::Get(const std::vector<std::string>& s_cmd) const {
     } else if (s_cmd[1] == "count" && s_cmd.size() > 2 && IsNumber(s_cmd[2])) {
         std::cout << kernel_->GetCount(std::stoi(s_cmd[2])) << '\n';
     } else {
-        Out::ErrorGet();
+        out_->ErrorGet();
     }
 }
 
@@ -182,11 +185,11 @@ void Processor::Start() {
 
 void Processor::Stop() {
     if (!kernel_->IsStarted()) {
-        Out::ErrorKernelIsOff();
+        out_->ErrorKernelIsOff();
         return;
     }
     if (kernel_->IsStopped()) {
-        Out::WarningKernelIsAlreadyStopped();
+        out_->WarningKernelIsAlreadyStopped();
         return;
     }
     kernel_->Stop();
@@ -195,11 +198,11 @@ void Processor::Stop() {
 
 void Processor::HitShip(const std::vector<std::string>& s_cmd) {
     if (kernel_->IsWin()) {
-        Out::AbortAlreadyWin();
+        out_->AbortAlreadyWin();
         return;
     }
     if (kernel_->IsLose()) {
-        Out::AbortAlreadyLose();
+        out_->AbortAlreadyLose();
         return;
     }
     if (uint8_t shot = kernel_->HitShip({
@@ -214,11 +217,11 @@ void Processor::HitShip(const std::vector<std::string>& s_cmd) {
 
 void Processor::Shot() {
     if (kernel_->IsWin()) {
-        Out::AbortAlreadyWin();
+        out_->AbortAlreadyWin();
         return;
     }
     if (kernel_->IsLose()) {
-        Out::AbortAlreadyLose();
+        out_->AbortAlreadyLose();
         return;
     }
     Coords shot = kernel_->Shot();
@@ -235,10 +238,10 @@ void Processor::Dump(const std::vector<std::string>& s_cmd) {
 void Processor::Load(const std::vector<std::string>& s_cmd) {
     if (!kernel_->GetType() && Parser::Load(kernel_, s_cmd[1])) {
         std::cout << "ok\n";
-        Out::WarningLoad();
+        out_->WarningLoad();
     } else {
         if (kernel_->GetType()) {
-            Out::ErrorLoadMasterPlayer();
+            out_->ErrorLoadMasterPlayer();
         }
         std::cout << "failed\n";
     }
@@ -257,5 +260,8 @@ void Processor::IsFinished() const {
 Processor::~Processor() {
     if (kernel_ != nullptr) {
         delete kernel_;  // we allocate this memory in proccesor run.
+    }
+    if (out_ != nullptr) {
+        delete out_;
     }
 }

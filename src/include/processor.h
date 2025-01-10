@@ -9,9 +9,9 @@
 
 class Processor {
 public:
-    void Run();
+    void Run(bool is_verbose);
     void Test() const;
-    bool Create(const std::vector<std::string>& s_cmd);
+    void Create(const std::vector<std::string>& s_cmd);
     void Set(const std::vector<std::string>& s_cmd);
     void Get(const std::vector<std::string>& s_cmd) const;
     void Start();
@@ -44,4 +44,5 @@ public:
     ~Processor();
 private:
     Kernel* kernel_ = nullptr;
+    Out* out_ = nullptr;
 };

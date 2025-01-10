@@ -2,40 +2,71 @@
 #include <iostream>
 #include "kernel.h"
 
-namespace Out {
+class Out {
+public:
     inline static char RED[8] = "\e[1;31m";
     inline static char YELLOW[8] = "\e[1;33m";
     inline static char PURPLE[8] = "\e[1;35m";
     inline static char WHITE[8] = "\e[1;97m";
     inline static char RESET[5] = "\e[0m";
 
-    void Welcome();
+    virtual void Welcome() {}
     
-    void ErrorKernelIsOff();
-    void WarningKernelIsAlreadyStopped();
+    virtual void ErrorKernelIsOff() {}
+    virtual void WarningKernelIsAlreadyStopped() {}
 
-    void ErrorSet();
+    virtual void ErrorSet() {}
 
-    void ErrorGet();
-    void ErrorEarlierMasterGetting();
+    virtual void ErrorGet() {}
+    virtual void ErrorEarlierMasterGetting() {}
 
-    void ErrorResult();
-    void ErrorResultCmd();
+    virtual void ErrorResult() {}
+    virtual void ErrorResultCmd() {}
 
-    void ErrorPlayerIsSet();
-    void ErrorPlayerIsUnset();
-    void ErrorPlayerIncorrect();
+    virtual void ErrorPlayerIsSet() {}
+    virtual void ErrorPlayerIsUnset() {}
+    virtual void ErrorPlayerIncorrect() {}
 
-    void ErrorStrategy();
-    void ErrorStrategyIsAlreadySet();
+    virtual void ErrorStrategy() {}
+    virtual void ErrorStrategyIsAlreadySet() {}
 
-    void WarningLoad();
-    void ErrorLoadMasterPlayer();
+    virtual void WarningLoad() {}
+    virtual void ErrorLoadMasterPlayer() {}
 
-    void AbortAlreadyWin();
-    void AbortAlreadyLose();
+    virtual void AbortAlreadyWin() {}
+    virtual void AbortAlreadyLose() {}
 
-    void ErrorUnknowCmd();
+    virtual void ErrorUnknowCmd() {}
 
     void PrintMap(const Kernel* kernel);
-}
+};
+
+class Verbose : public Out {
+    void Welcome() override;
+    
+    void ErrorKernelIsOff() override;
+    void WarningKernelIsAlreadyStopped() override;
+
+    void ErrorSet() override;
+
+    void ErrorGet() override;
+    void ErrorEarlierMasterGetting() override;
+
+    void ErrorResult() override;
+    void ErrorResultCmd() override;
+
+    void ErrorPlayerIsSet() override;
+    void ErrorPlayerIsUnset() override;
+    void ErrorPlayerIncorrect() override;
+
+    void ErrorStrategy() override;
+    void ErrorStrategyIsAlreadySet() override;
+
+    void WarningLoad() override;
+    void ErrorLoadMasterPlayer() override;
+
+    void AbortAlreadyWin() override;
+    void AbortAlreadyLose() override;
+
+    void ErrorUnknowCmd() override;
+};

@@ -26,7 +26,7 @@ class Strategy {
     Analyze of the enemy's game.
 */
 public:
-    Strategy(Dimension* d, uint64_t s) : dimension_(d), ships_sum_(s) {}
+    Strategy(Dimension* d, uint64_t s = 0) : dimension_(d), ships_sum_(s) {}
     uint64_t GetWidth() const;
     uint64_t GetHeight() const;
     uint64_t GetShipsSum() const;
@@ -44,7 +44,7 @@ protected:
 
 class OrderedStrategy : public Strategy {
 public:
-    OrderedStrategy(Dimension* d, uint64_t s): Strategy(d, s) {}
+    OrderedStrategy(Dimension* d, uint64_t s = 0): Strategy(d, s) {}
     Coords Shot() override;
     Generated Generate() override;
 private:
@@ -53,7 +53,7 @@ private:
 
 class CustomStrategy : public Strategy {
 public:
-    CustomStrategy(Dimension* d, uint64_t s) : Strategy(d, s) {}
+    CustomStrategy(Dimension* d, uint64_t s = 0) : Strategy(d, s) {}
     Coords Shot() override;
     Generated Generate() override;
     void SetKill() override;

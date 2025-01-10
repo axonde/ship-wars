@@ -1,5 +1,12 @@
 #include "include/utils.h"
 
+void Out::AbortAlreadyWin() {
+    std::cout << "failed\n";
+}
+void Out::AbortAlreadyLose() {
+    std::cout << "failed\n";
+}
+
 void Out::PrintMap(const Kernel* kernel) {
     std::cout << kernel->GetMap();
 }

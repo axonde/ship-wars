@@ -31,12 +31,12 @@ public:
     bool IsStopped() const;
     bool IsWin() const;
     bool IsLose() const;
-    bool IsStrategySet() const;
 
     void Start();
     void Stop();
     uint8_t HitShip(const Coords& coords);
     Coords Shot();
+    void Generate();
 
     ~Kernel();
 private:

@@ -15,8 +15,8 @@
 #include <boost/random.hpp>
 
 struct Dimension {
-    uint64_t width_;
-    uint64_t height_;
+    uint64_t width_ = 0;
+    uint64_t height_ = 0;
     bool Empty() const;
 };
 

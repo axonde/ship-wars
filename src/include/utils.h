@@ -33,8 +33,8 @@ public:
     virtual void WarningLoad() {}
     virtual void ErrorLoadMasterPlayer() {}
 
-    virtual void AbortAlreadyWin() {}
-    virtual void AbortAlreadyLose() {}
+    virtual void AbortAlreadyWin();
+    virtual void AbortAlreadyLose();
 
     virtual void ErrorUnknowCmd() {}
 

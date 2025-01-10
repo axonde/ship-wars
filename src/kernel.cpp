@@ -1,7 +1,9 @@
 #include "include/kernel.h"
 
 Kernel::Kernel(bool type) : type_(type) {
+    strategy_ = new CustomStrategy(&dimension_);
     ships_.fill(0);
+    if (type_) Generate();
 }
 
 bool Kernel::SetWidth(uint64_t width) {
@@ -20,10 +22,18 @@ bool Kernel::SetCount(uint8_t type, uint64_t count) {
     return true;
 }
 void Kernel::SetOrderedStrategy() {
-    strategy_ = new OrderedStrategy(&dimension_, ships_sum_);
+    if (strategy_ != nullptr) {
+        delete strategy_;
+    }
+    strategy_ = new OrderedStrategy(&dimension_);
+    Generate();
 }
 void Kernel::SetCustomStrategy() {
-    strategy_ = new CustomStrategy(&dimension_, ships_sum_);
+    if (strategy_ != nullptr) {
+        delete strategy_;
+    }
+    strategy_ = new CustomStrategy(&dimension_);
+    Generate();
 }
 void Kernel::SetKill() {
     strategy_->SetKill();
@@ -58,7 +68,7 @@ const bool Kernel::GetType() const {
 }
 
 bool Kernel::IsReady() const {
-    if (!type_ && (dimension_.Empty() || std::all_of(ships_.begin(), ships_.end(), [](const auto& x) {return x == 0;}))) {
+    if (dimension_.Empty() || std::all_of(ships_.begin(), ships_.end(), [](const auto& x) {return x == 0;})) {
         return false;
     }
     return true;
@@ -75,19 +85,8 @@ bool Kernel::IsWin() const {
 bool Kernel::IsLose() const {
     return map_->GetSize() == 0;
 }
-bool Kernel::IsStrategySet() const {
-    return strategy_ != nullptr;
-}
 
 void Kernel::Start() {
-    if (strategy_ == nullptr) {
-        strategy_ = new CustomStrategy(&dimension_, ships_sum_);
-    }
-    if (type_) {  // we are master -> generate the dimension.
-        Generated generated = strategy_->Generate();
-        dimension_ = generated.dimension_;
-        ships_ = generated.ships_;
-    }
     for (uint8_t t = 1; t != 5; ++t) {
         ships_sum_ += t * ships_[t];
     }
@@ -104,6 +103,12 @@ uint8_t Kernel::HitShip(const Coords& coords) {
 }
 Coords Kernel::Shot() {
     return strategy_->Shot();
+}
+
+void Kernel::Generate() {
+    Generated generated = strategy_->Generate();
+    dimension_ = generated.dimension_;
+    ships_ = generated.ships_;
 }
 
 Kernel::~Kernel() {

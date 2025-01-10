@@ -2,7 +2,6 @@
 
 void Processor::Run(bool is_verbose) {
     out_ = is_verbose ? new Verbose : new Out;
-
     out_->Welcome();
 
     std::string cmd;
@@ -26,14 +25,7 @@ void Processor::Run(bool is_verbose) {
             out_->ErrorPlayerIsUnset();
             continue;
         }
-        
-        // START & STOP
-        else if (s_cmd[0] == "start") {
-            Start();
-        } else if (s_cmd[0] == "stop") {
-            Stop();
-        }
-        
+
         // SETTERS
         else if (s_cmd[0] == "set" && s_cmd.size() > 2) {
             Set(s_cmd);
@@ -44,18 +36,31 @@ void Processor::Run(bool is_verbose) {
             Get(s_cmd);
         }
 
-        // PARSE
-        else if (s_cmd[0] == "dump" && s_cmd.size() > 1) {
-            Dump(s_cmd);
-        } else if (s_cmd[0] == "load" && s_cmd.size() > 1) {
+        // LOAD
+        else if (s_cmd[0] == "load" && s_cmd.size() > 1) {
             Load(s_cmd);
+        }
+
+        // START
+        else if (s_cmd[0] == "start") {
+            Start();
         }
 
         else if (!kernel_->IsStarted()) {
             out_->ErrorKernelIsOff();
             continue;
         }
-        
+
+        // DUMP
+        else if (s_cmd[0] == "dump" && s_cmd.size() > 1) {
+            Dump(s_cmd);
+        }
+
+        // STOP
+        else if (s_cmd[0] == "stop") {
+            Stop();
+        }
+
         // STATUS
         else if (s_cmd[0] == "finished") {
             IsFinished();
@@ -63,7 +68,10 @@ void Processor::Run(bool is_verbose) {
             IsWin();
         } else if (s_cmd[0] == "lose") {
             IsLose();
-        } else if (s_cmd[0] == "print") {
+        }
+
+        // PRINT (custom)
+        else if (s_cmd[0] == "print") {
             out_->PrintMap(kernel_);
         }
 
@@ -78,7 +86,7 @@ void Processor::Run(bool is_verbose) {
         } else if (s_cmd[0] == "shot") {
             Shot();
         }
-        
+
         else {
             out_->ErrorUnknowCmd();
         }
@@ -131,9 +139,7 @@ void Processor::Set(const std::vector<std::string>& s_cmd) {
     }
 
     else if (s_cmd[1] == "strategy") {
-        if (kernel_->IsStrategySet()) {
-            out_->ErrorStrategyIsAlreadySet();
-        } else if (s_cmd[2] == "ordered") {
+        if (s_cmd[2] == "ordered") {
             kernel_->SetOrderedStrategy();
             std::cout << "ok\n";
         } else if (s_cmd[2] == "custom") {
@@ -145,6 +151,7 @@ void Processor::Set(const std::vector<std::string>& s_cmd) {
     else if ((s_cmd[1] == "width" || s_cmd[1] == "height" || s_cmd[1] == "count") && !kernel_->GetType()) {
         if (!IsNumber(s_cmd[2]) || !(!(s_cmd.size() > 3) || IsNumber(s_cmd[3]))) {
             std::cout << "failed\n";
+            return;
         }
         if (s_cmd[1] == "width") {
             std::cout << (kernel_->SetWidth(std::stoll(s_cmd[2])) ? "ok\n" : "failed\n");
@@ -159,15 +166,11 @@ void Processor::Set(const std::vector<std::string>& s_cmd) {
 }
 
 void Processor::Get(const std::vector<std::string>& s_cmd) const {
-    if (!kernel_->IsStarted()) {
-        out_->ErrorEarlierMasterGetting();
-        return;
-    }
     if (s_cmd[1] == "width") {
         std::cout << kernel_->GetWidth() << '\n';
     } else if (s_cmd[1] == "height") {
         std::cout << kernel_->GetHeight() << '\n';
-    } else if (s_cmd[1] == "count" && s_cmd.size() > 2 && IsNumber(s_cmd[2])) {
+    } else if (s_cmd[1] == "count" && s_cmd.size() > 2 && IsNumber(s_cmd[2]) && "1" <= s_cmd[2] && s_cmd[2] <= "4") {
         std::cout << kernel_->GetCount(std::stoi(s_cmd[2])) << '\n';
     } else {
         out_->ErrorGet();
@@ -186,10 +189,12 @@ void Processor::Start() {
 void Processor::Stop() {
     if (!kernel_->IsStarted()) {
         out_->ErrorKernelIsOff();
+        std::cout << "failed\n";
         return;
     }
     if (kernel_->IsStopped()) {
         out_->WarningKernelIsAlreadyStopped();
+        std::cout << "failed\n";
         return;
     }
     kernel_->Stop();
@@ -259,7 +264,7 @@ void Processor::IsFinished() const {
 
 Processor::~Processor() {
     if (kernel_ != nullptr) {
-        delete kernel_;  // we allocate this memory in proccesor run.
+        delete kernel_;
     }
     if (out_ != nullptr) {
         delete out_;

@@ -23,8 +23,8 @@ bool Coords::IsTouchingLeft() const {
     return x == 0;
 }
 
-std::size_t CoordsHash::operator () (const Coords& coords) const {
-    std::size_t seed = 0;
+size_t CoordsHash::operator () (const Coords& coords) const {
+    size_t seed = 0;
     boost::hash_combine(seed, coords.x);
     boost::hash_combine(seed, coords.y);
     return seed;

@@ -1,18 +1,20 @@
 #pragma once
-#include <array>
 #include <algorithm>
+#include <array>
+#include <cstddef>
 #include <cstdint>
 #include <ctime>
 #include <functional>
 #include <iostream>
 #include <iterator>
 #include <map>
-#include <numeric>
 #include <tuple>
-#include <boost/unordered/unordered_flat_map.hpp>
-#include <boost/unordered_set.hpp>
+#include <utility>
+#include <vector>
 #include <boost/functional/hash.hpp>
 #include <boost/random.hpp>
+#include <boost/unordered_set.hpp>
+#include <boost/unordered/unordered_flat_map.hpp>
 
 struct Dimension {
     uint64_t width_ = 0;
@@ -33,7 +35,7 @@ struct Coords {
 };
 
 struct CoordsHash {
-    std::size_t operator () (const Coords& coords) const;
+    size_t operator () (const Coords& coords) const;
 };
 
 using UnorderedMap = boost::unordered_flat_map<Coords, uint8_t, CoordsHash>;

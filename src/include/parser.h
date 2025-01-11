@@ -4,6 +4,7 @@
 #include <functional>
 #include <iostream>
 #include <iterator>
+#include <string>
 #include <vector>
 #include "kernel.h"
 #include "map.h"

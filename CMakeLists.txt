@@ -13,10 +13,6 @@ set(LOCAL_BOOST_PATH "${CMAKE_SOURCE_DIR}/src/boost")
 include_directories(SYSTEM ${LOCAL_BOOST_PATH})
 message(STATUS "Using local Boost library: ${LOCAL_BOOST_PATH}")
 
-message(STATUS "CMAKE_INCLUDE_PATH: ${CMAKE_INCLUDE_PATH}")
-message(STATUS "CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE: ${CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE}")
-
-
 add_compile_options(-fsanitize=address)
 add_link_options(-fsanitize=address)
 

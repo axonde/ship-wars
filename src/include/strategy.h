@@ -1,7 +1,9 @@
 #pragma once
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <cstdint>
+#include <ctime>
 #include <iterator>
 #include <functional>
 #include <set>
@@ -13,7 +15,7 @@
 
 struct Generated {
 /*
-    Information of our generated info: dimension and ship counts.
+    Information of generated info: dimension and ship counts.
 */
     Dimension dimension_;
     std::array<uint64_t, 5> ships_;
@@ -22,7 +24,7 @@ struct Generated {
 
 class Strategy {
 /*
-    Operate all our desision to win the enemy: make shots, set parameters (if we are master).
+    Operate all our decision to win the enemy: make shots, generate parameters (if it needs).
     Analyze of the enemy's game.
 */
 public:

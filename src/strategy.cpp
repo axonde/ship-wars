@@ -31,7 +31,6 @@ void Strategy::SetHit() {
     }
 }
 
-
 /* ORDERED */
 Coords OrderedStrategy::Shot() {
     Coords coords_out = coords_;
@@ -46,11 +45,7 @@ Generated OrderedStrategy::Generate() {
     return generated;
 }
 
-
 /* CUSTOM */
-/*
-    If the game is won and we try to continue do shots -> UB. (fix in next update)
-*/
 Generated CustomStrategy::Generate() {
     boost::random::mt19937 generator(static_cast<unsigned>(std::time(0)));
     boost::random::uniform_int_distribution<> distribution_size(15, 100);
@@ -216,8 +211,8 @@ void CustomStrategy::next_square_() {
     }
 }
 
-
-/* old custom strategy -> now obsolete */
+/* EXP */
+// old custom strategy (exp status) -> now obsolete
 Coords ExpStrategy::Shot() {
     /*
         very bad choice if you have big dimension and a small quantity of avaible pixel...

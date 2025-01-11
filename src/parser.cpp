@@ -12,7 +12,7 @@ bool Parser::Dump(Kernel* kernel, const std::string& path) {
 
     file << kernel->GetWidth() << ' ' << kernel->GetHeight() << '\n';
     UnorderedSet map = kernel->GetMap().GetMap();
-    UnorderedMap ships;  // ships[i] = 012 -> 0 / 1 - type, 2 -> length
+    UnorderedMap ships;  // ships[i] = 12 -> 0 / 1 - type (x / 10), 2 -> length (x % 10)
     while (!map.empty()) {
         std::vector<Coords> ship;
         Coords coord = *map.begin();
@@ -60,7 +60,6 @@ bool Parser::Dump(Kernel* kernel, const std::string& path) {
         ships.insert({*ship.begin(), type * 10 + ship.size()});
     }
 
-    // debug
     for (const auto& [coord, info] : ships) {
         file << info % 10 << ' ' << (info / 10 == 0 ? 'h' : 'v') << ' ' << coord.x << ' ' << coord.y << '\n';
     }

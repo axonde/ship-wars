@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -8,6 +9,9 @@
 #include "utils.h"
 
 class Processor {
+/*
+    Manage the cmds: verification and delegation of user's actions.
+*/
 public:
     void Run(bool is_verbose);
     void Test() const;

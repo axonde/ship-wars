@@ -39,14 +39,6 @@ Coords OrderedStrategy::Shot() {
     return coords_out;
 }
 Generated OrderedStrategy::Generate() {
-    Generated generated;
-    generated.dimension_ = {4 * 30 + 29, 101};
-    generated.ships_ = {0, 0, 0, 0, 51 * 30};
-    return generated;
-}
-
-/* CUSTOM */
-Generated CustomStrategy::Generate() {
     boost::random::mt19937 generator(static_cast<unsigned>(std::time(0)));
     boost::random::uniform_int_distribution<> distribution_size(15, 100);
     boost::random::uniform_int_distribution<> distribution_ships(2, 10);
@@ -57,6 +49,22 @@ Generated CustomStrategy::Generate() {
     for (uint8_t i = 1; i != 5; ++i) {
         generated.ships_[i] = distribution_ships(generator);
     }
+    return generated;
+}
+
+/* CUSTOM */
+Generated CustomStrategy::Generate() {
+    /* little upgrade for tournament: goal to approach full field case */
+    boost::random::mt19937 generator(static_cast<unsigned>(std::time(0)));
+    boost::random::uniform_int_distribution<> distributionX(50, 70);
+    boost::random::uniform_int_distribution<> distributionY(140, 170);
+
+    Generated generated;
+    uint64_t x = distributionX(generator);
+    uint64_t y = distributionY(generator);
+    generated.dimension_ = {4 * x + (x - 1), y * 2 - 1};
+    generated.ships_[4] = static_cast<uint64_t>(x * y * 0.8);
+
     return generated;
 }
 Coords CustomStrategy::Shot() {

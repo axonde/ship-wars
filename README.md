@@ -263,6 +263,11 @@ flowchart LR
 Стратегия выполняет перебор в ширину, начиная с верхней левой клетки поля, заканчивая нижней правой. Примитивная логика, которая, к слову, выиграла не последнее место на проведённом соревновновании среди нашего курса!
 
 ![ordered strategy](assets/ordered.png)
+<img
+    src="assets/ordered.png"
+    alt="ordered strategy"
+    width=500px
+/>
 
 ### Custom
 
@@ -270,7 +275,11 @@ flowchart LR
 
 Схематичная последовательность выстрелов группы 4x4(в дальнейшем `chunk`):
 
-![custom strategy](assets/custom.png)
+<img
+    src="assets/custom.png"
+    alt="custom strategy"
+    width=500px
+/>
 
 Каждый `chunk` уничтожается по опредёлнному перебору, позволяющий разбить точное уничтожение каждого типа корабля на 4 этапа:
 
@@ -321,9 +330,13 @@ size [type] (coords)
 ```
 
 `width` - ширина
+
 `height` - высота
+
 `size` - размер [1, 2, 3, 4]
+
 `type` - направление [h(horizontally) / v(vertically)]
+
 `coords` - координаты левого верхнего угла (x, y)
 
 Пример

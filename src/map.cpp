@@ -48,7 +48,7 @@ Map::Map(Dimension* dimension, std::array<uint64_t, 5> ships, uint64_t ships_sum
     for (uint8_t type = 4; type != 0; --type) {
         for (uint64_t i = 0; i != ships[type]; ++i) {
             if (uint64_t available_size = dimension_->width_ * dimension_->height_ - restricted_area.size();
-            type == min_type && available_size >= (ships[type] - i) * type_k_[type]) {
+            type == min_type && available_size >= (ships[type] - i) * type * type_k_[type]) {
                 set_ship_(drawing, restricted_area, type, &generator);
             } else {
                 set_ship_(drawing, restricted_area, type);
@@ -209,13 +209,15 @@ void Map::choose_pixels_(const UnorderedMap& drawing, std::vector<std::pair<Coor
 void Map::update_restricted_area_(UnorderedMap& drawing, UnorderedSet& restricted_area, const Coords& coords, uint8_t type, bool rotate) const {
     uint8_t width = 1 + (type - 1) * !rotate;
     uint8_t height = 1 + (type - 1) * rotate;
+    Coords left_top = coords;
+    Coords right_bottom = {coords.x + width - 1, coords.y + height - 1};
 
     for (int8_t y = -1; y != height + 1; ++y) {
         for (int8_t x = -1; x != width + 1; ++x) {
-            if ((coords.IsTouchingTop() && y == -1)
-            || (coords.IsTouchingRight(*dimension_) && x == width)
-            || (coords.IsTouchingBottom(*dimension_) && y == height)
-            || (coords.IsTouchingLeft() && x == -1)) {
+            if ((left_top.IsTouchingTop() && y == -1)
+            || (right_bottom.IsTouchingRight(*dimension_) && x == width)
+            || (right_bottom.IsTouchingBottom(*dimension_) && y == height)
+            || (left_top.IsTouchingLeft() && x == -1)) {
                 continue;
             }
             if (auto iter = drawing.find({coords.x + x, coords.y + y}); iter != drawing.end()) {
@@ -235,13 +237,13 @@ void Map::set_ship_(UnorderedMap& drawing, UnorderedSet& restricted_area, uint8_
 
         std::function<bool(const Coords&)> can_be_horizontal = [&](const Coords& coords) {
             for (uint i = 0; i != type; ++i) {
-                if (auto iter = restricted_area.find({coords.x + i, coords.y}); iter != restricted_area.end()) return false;
+                if (auto iter = restricted_area.find({coords.x + i, coords.y}); iter != restricted_area.end() || coords.x + i >= dimension_->width_) return false;
             }
             return true;
         };
         std::function<bool(const Coords&)> can_be_vertical = [&](const Coords& coords) {
             for (uint i = 0; i != type; ++i) {
-                if (auto iter = restricted_area.find({coords.x, coords.y + i}); iter != restricted_area.end()) return false;
+                if (auto iter = restricted_area.find({coords.x, coords.y + i}); iter != restricted_area.end() || coords.y + i >= dimension_->height_) return false;
             }
             return true;
         };

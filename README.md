@@ -281,10 +281,18 @@ flowchart LR
 ![second step custom strategy](assets/custom-step-2.png)
 
 - Поиск 2-х палублных кораблей (эсминцы):
-![third step custom strategy](assets/custom-step-3.png)
+<img>
+    src="assets/custom-step-3.png"
+    alt="third step custom strategy"
+    width=500px
+</img>
 
 - Поиск 1 палубных кораблей (торпедные катеры):
-![fourth step custom strategy](assets/custom-step-4.png)
+<img>
+    src="assets/custom-step-4.png"
+    alt="fourth step custom strategy"
+    width=500px
+</img>
 
 > Главная особенность данного перебора состоит в том, что `chunk`s перебираются последовательно согласно этапам, а не цельно по-одному. Это позволяет с большей вероятностью найти максимальный корабль за вероятное наименьшее число шагов.
 
